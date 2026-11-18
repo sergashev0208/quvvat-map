@@ -40,8 +40,6 @@ async function initQuvvat(){
  await Promise.race([ymaps3.ready,new Promise((_,reject)=>setTimeout(()=>reject(new Error('timeout')),25000))]);
 
 let payload=window.QUVVAT_DATA, stations=payload.stations;
- let payload=window.QUVVAT_DATA, stations=payload.stations;
-
 payload.logos.amppal = {
   data_url: "./beon.png",
   background: "#ffffff"
