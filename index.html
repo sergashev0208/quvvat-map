@@ -40,6 +40,12 @@ async function initQuvvat(){
  await Promise.race([ymaps3.ready,new Promise((_,reject)=>setTimeout(()=>reject(new Error('timeout')),25000))]);
 
 let payload=window.QUVVAT_DATA, stations=payload.stations;
+ let payload=window.QUVVAT_DATA, stations=payload.stations;
+
+payload.logos.amppal = {
+  data_url: "./beon.png",
+  background: "#ffffff"
+};
 const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let userLocation=null,pickingLocation=false,locationRequest=0,userMarker=null,radiusCircle=null,accuracyCircle=null;
 function distanceMeters(a,b){const rad=x=>x*Math.PI/180,dp=rad(b.lat-a.lat),dl=rad(b.lon-a.lon),v=Math.sin(dp/2)**2+Math.cos(rad(a.lat))*Math.cos(rad(b.lat))*Math.sin(dl/2)**2;return 12742000*Math.asin(Math.sqrt(Math.max(0,Math.min(1,v))));}
