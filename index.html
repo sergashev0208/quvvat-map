@@ -844,10 +844,19 @@
         }
       }
     </style>
-  </head>
+  <style>
+      header {position:absolute}
+      #language {position:absolute;right:12px;top:10px;min-height:32px;padding:4px;max-width:100px}
+      #nearList {margin-top:8px}
+      #nearList h2 {font-size:16px;margin:6px 0}
+      #nearRows {max-height:19dvh;overflow:auto}
+      #nearRows button {display:flex;width:100%;align-items:center;justify-content:space-between;text-align:left;gap:8px;margin:3px 0}
+      #nearRows strong {min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      #nearRows small {white-space:nowrap}
+    </style></head>
 
   <body>
-    <header>
+    <header><select id="language" aria-label="Til / Язык / Language"><option value="uz">O‘zbekcha</option><option value="ru">Русский</option><option value="en">English</option></select>
       <h1>⚡️ Quvvat</h1>
       <span>Yo‘lingizdagi quvvat</span>
     </header>
@@ -912,7 +921,9 @@
         </div>
       </details>
 
-      <div id="locationStatus" role="status"></div>
+      <section id="nearList" hidden><h2>Yaqin stansiyalar</h2>
+      <select id="nearSort" aria-label="↕"><option value="distance">Eng yaqin</option><option value="price">Eng arzon</option></select>
+      <div id="nearRows"></div></section><div id="locationStatus" role="status"></div>
     </div>
 
     <div class="filters">
@@ -990,9 +1001,26 @@
       <div id="stationContent"></div>
     </aside>
 
+    <script src="./map-language.js"></script>
     <script src="./stations-data.js"></script>
 
     <script>
+      const languageSelect = document.getElementById("language");
+      languageSelect.value = pageLanguage;
+      languageSelect.onchange = () => {
+        const url = new URL(location.href);
+        url.searchParams.set("lang", languageSelect.value);
+        location.replace(url);
+      };
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      while (walker.nextNode()) {
+        const node = walker.currentNode;
+        if (node.parentElement.closest("script,style")) continue;
+        const label = node.textContent.trim();
+        if (words[label]) node.textContent = translate(label);
+      }
+      const search = document.getElementById("search");
+      search.placeholder = translate(search.placeholder);
       async function initQuvvat() {
         if (location.hostname === "127.0.0.1") {
           const url = new URL(location.href);
@@ -1018,7 +1046,7 @@
           script.src =
             "https://api-maps.yandex.ru/v3/?apikey=" +
             encodeURIComponent(apiKey) +
-            "&lang=ru_RU";
+            "&lang=" + ({uz:"ru_RU",ru:"ru_RU",en:"en_US"}[pageLanguage]);
 
           script.onload = () => {
             clearTimeout(timeout);
@@ -1708,6 +1736,7 @@
 
         function showStation(s) {
           selectedStation = s;
+          map.setView([s.lat,s.lon], Math.max(17,map.getZoom()));
           $("stationContent").innerHTML = popup(s);
           $("stationPanel").hidden = false;
 
@@ -1894,6 +1923,32 @@
           },
         };
 
+        function renderNearby(list) {
+          $("nearList").hidden = !userLocation;
+          if (!userLocation) return;
+          const entries = list.map(st => {
+            const tariff = st.manual_tariffs || operatorTariffs[st.operator] || {};
+            const price = !tariff.estimated && Number.isFinite(tariff.day) && tariff.day >= 0 ? tariff.day : Infinity;
+            return {st, metres: distanceMeters(userLocation, st), price};
+          }).filter(row => row.metres <= Number($("radius").value));
+          entries.sort((a,b) => ($("nearSort").value === "price" && a.price !== b.price)
+            ? a.price-b.price : a.metres-b.metres);
+          const rows = $("nearRows");
+          rows.replaceChildren();
+          for (const {st, metres, price} of entries) {
+            const button = document.createElement("button");
+            const name = document.createElement("strong");
+            const detail = document.createElement("small");
+            name.textContent = st.name;
+            detail.textContent = distanceLabel(metres) + " · " + (Number.isFinite(price)
+              ? price.toLocaleString() + " " + translate("so‘m/kWh") : translate("Narx noma’lum"));
+            button.append(name, detail);
+            button.onclick = () => showStation(st);
+            rows.append(button);
+          }
+          if (!entries.length) rows.textContent = translate("Bu hududda stansiya topilmadi. Radius yoki filtrni o‘zgartiring.");
+        }
+        $("nearSort").onchange = () => draw(false);
         function popup(s) {
           const tariffs =
             s.manual_tariffs ||
@@ -1913,10 +1968,10 @@
 
             return (
               esc(amount.toLocaleString("uz-UZ")) +
-              " so‘m/kWh" +
+              " " + translate("so‘m/kWh") +
               (
                 tariffs.estimated
-                  ? ' <span class="muted">(Taxminiy)</span>'
+                  ? ' <span class="muted">' + translate("(Taxminiy)") + '</span>'
                   : ""
               )
             );
@@ -1936,17 +1991,18 @@
           const links =
             '<p><a target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&destination=' +
             coords +
-            '">Google yo‘nalish</a> · <a target="_blank" rel="noopener noreferrer" href="https://yandex.com/maps/?rtext=~' +
+            '">' + translate("Google yo‘nalish") + '</a> · <a target="_blank" rel="noopener noreferrer" href="https://yandex.com/maps/?rtext=~' +
             coords +
-            '&rtt=auto">Yandex yo‘nalish</a></p>';
+            '&rtt=auto">' + translate("Yandex yo‘nalish") + '</a></p>';
 
           return (
             heading +
-            '<div class="tariff-only"><p><b>Kunduzgi narx</b><br>' +
+            '<div class="tariff-only"><p><b>' + translate("Kunduzgi narx") + '</b><br>' +
             price("day") +
-            "</p><p><b>Kechki narx</b><br>" +
+            "</p><p><b>" + translate("Kechki narx") + "</b><br>" +
             price("night") +
-            "</p></div>" +
+            "</p></div><b>" + translate("Ulagich va quvvat") + "</b><br>" +
+            esc([...new Set(specs(s).map(c => [c.type,c.power ? c.power+" kW" : null].filter(Boolean).join(" · ")).filter(Boolean))].join(", ") || translate("Noma’lum")) +
             links
           );
         }
@@ -2200,6 +2256,7 @@
               popup(selectedStation);
           }
 
+          renderNearby(list);
           $("emptyResult").hidden = !!list.length;
 
           $("emptyResult").textContent = list.length
@@ -2269,8 +2326,8 @@
 
           if (!closest || best > 2000) {
             return point.manual
-              ? "Xaritadan tanlangan joy"
-              : "Joylashuvingiz xaritada belgilandi";
+              ? translate("Xaritadan tanlangan joy")
+              : translate("Joylashuvingiz xaritada belgilandi");
           }
 
           const parts = [
@@ -2280,7 +2337,7 @@
 
           return (
             [...new Set(parts)].join(", ") +
-            " yaqinida"
+            translate(" yaqinida")
           );
         }
 
@@ -2355,8 +2412,8 @@
           $("locationStatus").textContent =
             (
               manual
-                ? "Tanlangan joy: "
-                : "Siz turgan joy: "
+                ? translate("Tanlangan joy: ")
+                : translate("Siz turgan joy: ")
             ) + address;
 
           userMarker.setPopupContent(esc(address));
@@ -2437,7 +2494,7 @@
             !window.Telegram?.WebApp?.LocationManager
           ) {
             $("locationStatus").textContent =
-              "Brauzer joylashuvni qo‘llamaydi. Markazni xaritadan tanlang.";
+              translate("Brauzer joylashuvni qo‘llamaydi. Markazni xaritadan tanlang.");
             return;
           }
 
@@ -2455,7 +2512,7 @@
           $("locate").disabled = true;
 
           $("locationStatus").textContent =
-            "Joylashuv aniqlanmoqda… Brauzer ruxsatini tasdiqlang.";
+            translate("Joylashuv aniqlanmoqda… Brauzer ruxsatini tasdiqlang.");
 
           miniAppLocation(
             (p) => {
@@ -2478,10 +2535,10 @@
 
               $("locationStatus").textContent =
                 {
-                  1: "Joylashuvga ruxsat berilmadi. Brauzer ruxsatini tekshiring yoki markazni xaritadan tanlang.",
-                  2: "Joylashuvni aniqlab bo‘lmadi. Markazni xaritadan tanlang.",
-                  3: "Joylashuvni aniqlash vaqti tugadi. Qayta urinib ko‘ring yoki markazni tanlang.",
-                }[e.code] || "Joylashuv olinmadi.";
+                  1: translate("Joylashuvga ruxsat berilmadi. Brauzer ruxsatini tekshiring yoki markazni xaritadan tanlang."),
+                  2: translate("Joylashuvni aniqlab bo‘lmadi. Markazni xaritadan tanlang."),
+                  3: translate("Joylashuvni aniqlash vaqti tugadi. Qayta urinib ko‘ring yoki markazni tanlang."),
+                }[e.code] || translate("Joylashuv olinmadi.");
             },
 
             {
@@ -2507,7 +2564,7 @@
 
             if (pickingLocation) {
               $("locationStatus").textContent =
-                "Qidiruv markazi uchun xaritadagi kerakli joyni bosing.";
+                translate("Qidiruv markazi uchun xaritadagi kerakli joyni bosing.");
             }
           }
         );
@@ -2569,7 +2626,7 @@
             $("clearLocation").disabled = true;
 
             $("locationStatus").textContent =
-              "Joylashuv tozalandi.";
+              translate("Joylashuv tozalandi.");
 
             draw(true);
           }
@@ -2635,12 +2692,12 @@
         actions.style.marginTop = "12px";
 
         const retry = document.createElement("button");
-        retry.textContent = "Qayta urinish";
+        retry.textContent = translate("Qayta urinish");
         retry.onclick = () => location.reload();
 
         const previous = document.createElement("a");
         previous.href = "./map_previous.html";
-        previous.textContent = "Avvalgi xaritani ochish";
+        previous.textContent = translate("Avvalgi xaritani ochish");
         previous.style.marginLeft = "12px";
 
         actions.append(retry, previous);
