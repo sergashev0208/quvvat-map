@@ -596,7 +596,7 @@
         margin: -10px -10px 4px 8px;
       }
 
-      #stationContent > b:first-child {
+      #stationContent > b {
         font-size: 22px;
         line-height: 1.3;
         display: inline-block;
@@ -855,6 +855,7 @@
       #nearRows small {white-space:nowrap}
 
       #stationPanel {padding:20px;border-radius:20px;line-height:1.45}
+      .station-operator {display:block;font-size:15px;color:var(--green);margin-bottom:4px}
       .sheet-address {display:block;color:#53645e;margin:0 0 12px}
       .sheet-prices {display:grid;grid-template-columns:1fr 1fr;gap:6px}
       .sheet-prices p,.port-row {background:#f4f5f7;border-radius:10px;padding:10px;margin:0}
@@ -866,7 +867,6 @@
       .port-row strong {margin-left:auto;white-space:nowrap}
       #stationContent .directions {display:flex;gap:6px;background:none;padding:0}
       #stationContent .directions a {flex:1;text-align:center;background:#4338df;color:white;padding:10px 4px;border-radius:10px}
-      .chosen-pin {display:grid;place-items:center;border:3px solid white;background:#4338df;color:white;width:32px;height:32px;border-radius:50%;box-shadow:0 0 0 6px #5045db38}
       .user-location {display:block;width:22px;height:22px;box-shadow:0 0 0 6px #2477ed44,0 2px 5px #0005}
       @media(max-width:700px){
         #stationPanel {bottom:0;left:0;right:0;max-height:54dvh;border-radius:20px 20px 0 0;padding-bottom:calc(16px + env(safe-area-inset-bottom))}
@@ -1752,7 +1752,6 @@
         });
 
         let selectedStation = null;
-        let selectedPin = null;
         function focusStation(s) {
           const zoom = Math.max(17,map.getZoom());
           const rect = $("map").getBoundingClientRect();
@@ -1767,9 +1766,6 @@
 
         function showStation(s) {
           selectedStation = s;
-          if (selectedPin) selectedPin.remove();
-          selectedPin = MapUI.marker([s.lat,s.lon], {title:s.name,zIndexOffset:1100,
-            icon:{html:'<span class="chosen-pin">⚡</span>',iconSize:[32,32]}}).addTo(map);
           document.body.classList.add("sheet-open");
           $("stationContent").innerHTML = popup(s);
           $("stationPanel").hidden = false;
@@ -1783,7 +1779,6 @@
         function closeStation() {
           $("stationPanel").hidden = true;
           selectedStation = null;
-          selectedPin?.remove(); selectedPin=null;
           document.body.classList.remove("sheet-open");
         }
 
@@ -2040,7 +2035,11 @@
             );
           }
 
+          const operatorName = s.operator && s.operator !== "noma'lum"
+            ? displayNames[s.operator] || s.operator
+            : translate("Noma’lum");
           const heading =
+            '<strong class="station-operator">' + esc(operatorName) + '</strong>' +
             "<b>" +
             esc(s.name || "Stansiya") +
             '</b><span class="sheet-address">' +
