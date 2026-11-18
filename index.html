@@ -875,8 +875,8 @@
       #sheetToggle {display:grid;place-items:center;width:100%;min-height:22px;padding:0;border:0;background:white;touch-action:none}
       .sheetGrip {width:38px;height:5px;border-radius:4px;background:#b7c6c0}
       #sheetToggle[aria-expanded=true] .sheetLabel,.locationbar.folded .sheetGrip {display:none}
-      .locationbar.folded {padding:1px 10px;overflow:hidden}
-      .locationbar.folded #sheetToggle {min-height:44px;font-weight:650}
+      .locationbar.folded {padding:0;overflow:hidden}
+      .locationbar.folded #sheetToggle {min-height:48px;font-weight:650;background:var(--green);color:white}
       #locate {touch-action:none}
       #nearRows,.locationbar {overscroll-behavior:contain}
     </style></head>
@@ -1036,7 +1036,7 @@
       const sheet = document.querySelector(".locationbar");
       const toggle = document.getElementById("sheetToggle");
       const bodyPanel = document.getElementById("locationBody");
-      const label = translate("📍 Mening joylashuvim").replace("📍", "").trim();
+      const label = translate("📍 Mening joylashuvim");
       toggle.querySelector(".sheetLabel").textContent = label;
       function foldPanel(folded) {
         sheet.classList.toggle("folded", folded);
