@@ -235,7 +235,10 @@ function popup(s){
   if(typeof amount!=='number'||!Number.isFinite(amount)||amount<0)return '&nbsp;';
   return esc(amount.toLocaleString('uz-UZ'))+' so‘m/kWh'+(tariffs.estimated?' <span class="muted">(Taxminiy)</span>':'');
  }
- return '<div class="tariff-only"><p><b>Kunduzgi narx</b><br>'+price('day')+'</p><p><b>Kechki narx</b><br>'+price('night')+'</p></div>';
+ const heading='<b>'+esc(s.name||'Stansiya')+'</b><br><span>'+esc(s.address||s.region||'')+'</span>';
+ const coords=encodeURIComponent(s.lat+','+s.lon);
+ const links='<p><a target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&destination='+coords+'">Google yo‘nalish</a> · <a target="_blank" rel="noopener noreferrer" href="https://yandex.com/maps/?rtext=~'+coords+'&rtt=auto">Yandex yo‘nalish</a></p>';
+ return heading+'<div class="tariff-only"><p><b>Kunduzgi narx</b><br>'+price('day')+'</p><p><b>Kechki narx</b><br>'+price('night')+'</p></div>'+links;
 }
 let markers=[];
 function matches(s){if(userLocation&&$('nearby').checked&&distanceMeters(userLocation,s)>Number($('radius').value))return false;if($('op').value&&s.operator!==$('op').value)return false;if($('region').value&&s.region!==$('region').value)return false;const q=$('search').value.toLocaleLowerCase();if(q&&!(s.name+' '+s.address+' '+s.operator).toLocaleLowerCase().includes(q))return false;
