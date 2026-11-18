@@ -872,6 +872,13 @@
         #stationPanel {bottom:0;left:0;right:0;max-height:54dvh;border-radius:20px 20px 0 0;padding-bottom:calc(16px + env(safe-area-inset-bottom))}
         body.sheet-open header,body.sheet-open .filters,body.sheet-open .locationbar {visibility:hidden}
       }
+      #sheetToggle {display:grid;place-items:center;width:100%;min-height:22px;padding:0;border:0;background:white;touch-action:none}
+      .sheetGrip {width:38px;height:5px;border-radius:4px;background:#b7c6c0}
+      #sheetToggle[aria-expanded=true] .sheetLabel,.locationbar.folded .sheetGrip {display:none}
+      .locationbar.folded {padding:1px 10px;overflow:hidden}
+      .locationbar.folded #sheetToggle {min-height:44px;font-weight:650}
+      #locate {touch-action:none}
+      #nearRows,.locationbar {overscroll-behavior:contain}
     </style></head>
 
   <body>
@@ -881,6 +888,8 @@
     </header>
 
     <div class="locationbar">
+      <button id="sheetToggle" type="button" aria-controls="locationBody" aria-expanded="true"><span class="sheetGrip"></span><span class="sheetLabel"></span></button>
+      <div id="locationBody">
       <button id="locate">
         📍 Mening joylashuvim
       </button>
@@ -942,7 +951,7 @@
 
       <section id="nearList" hidden><h2>Yaqin stansiyalar</h2>
       <select id="nearSort" aria-label="↕"><option value="distance">Eng yaqin</option><option value="price">Eng arzon</option></select>
-      <div id="nearRows"></div></section><div id="locationStatus" role="status"></div>
+      <div id="nearRows"></div></section><div id="locationStatus" role="status"></div></div>
     </div>
 
     <div class="filters">
@@ -1024,6 +1033,47 @@
     <script src="./stations-data.js"></script>
 
     <script>
+      const sheet = document.querySelector(".locationbar");
+      const toggle = document.getElementById("sheetToggle");
+      const bodyPanel = document.getElementById("locationBody");
+      const label = translate("📍 Mening joylashuvim").replace("📍", "").trim();
+      toggle.querySelector(".sheetLabel").textContent = label;
+      function foldPanel(folded) {
+        sheet.classList.toggle("folded", folded);
+        bodyPanel.hidden = folded;
+        toggle.setAttribute("aria-expanded", String(!folded));
+        toggle.setAttribute("aria-label", label);
+        sheet.scrollTop = 0;
+      }
+      foldPanel(false);
+      toggle.addEventListener("click", () => foldPanel(!bodyPanel.hidden));
+      let drag = null;
+      let suppressClickUntil = 0;
+      sheet.addEventListener("touchstart", e => {
+        const rowList = e.target.closest("#nearRows");
+        drag = e.touches.length === 1 && !bodyPanel.hidden && sheet.scrollTop <= 0 &&
+          !(rowList && rowList.scrollTop > 0) && !e.target.closest("select,input")
+          ? e.touches[0] : null;
+      }, {passive:true});
+      sheet.addEventListener("touchmove", e => {
+        if (!drag || e.touches.length !== 1) { drag=null; return; }
+        const dy = e.touches[0].clientY - drag.clientY;
+        const dx = e.touches[0].clientX - drag.clientX;
+        if (dy < -8 || Math.abs(dx) > Math.abs(dy)+10) { drag=null; return; }
+        if (dy > 12 && e.cancelable) e.preventDefault();
+        if (dy > 48) {
+          drag = null;
+          suppressClickUntil = performance.now()+500;
+          foldPanel(true);
+        }
+      }, {passive:false});
+      sheet.addEventListener("touchend", () => { drag=null; });
+      sheet.addEventListener("touchcancel", () => { drag=null; });
+      sheet.addEventListener("click", e => {
+        if (performance.now() < suppressClickUntil) {
+          e.preventDefault(); e.stopImmediatePropagation();
+        }
+      }, true);
       const languageSelect = document.getElementById("language");
       languageSelect.value = pageLanguage;
       languageSelect.onchange = () => {
