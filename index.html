@@ -1,297 +1,2651 @@
-<!doctype html><html lang="uz"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="strict-origin-when-cross-origin"><title>QuvvatUZ — Xarita</title><meta name="description" content="O‘zbekistondagi elektromobil zaryadlash stansiyalarini toping."><script src="https://telegram.org/js/telegram-web-app.js"></script>
+<!doctype html>
+<html lang="uz">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1"
+    />
+    <meta
+      name="referrer"
+      content="strict-origin-when-cross-origin"
+    />
 
-<style>
-*{box-sizing:border-box}body{margin:0;font:14px system-ui;color:#182b26;background:#f3f7f5;height:100dvh;display:flex;flex-direction:column}header{background:#123c32;color:white;padding:14px 18px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}h1{font-size:22px;margin:0}header small{opacity:.8}.filters{display:flex;gap:8px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid #dce5e0}select,input,button{font:inherit;padding:9px;border:1px solid #b6cbc0;border-radius:7px;background:white}input{min-width:180px;flex:1}button{cursor:pointer;background:#d6f5e3}button:disabled{opacity:.6;cursor:wait}#emptyResult{padding:8px 16px}#map{flex:1;min-height:200px}.leaflet-popup-content{max-height:390px;overflow:auto;width:300px!important}.card{padding:9px 0;border-bottom:1px solid #ddd}.muted{color:#60756b;font-size:12px}.warning{background:#fff1cb;padding:8px;border-radius:5px}.sources{font-size:11px;margin-top:6px}.pill{font-weight:600}#notice{display:none;background:#fff1cb;padding:10px 16px}a{color:#086543}#sourceSummary{font-size:12px;padding:0 16px 8px}.legend{font-size:12px} @media(max-width:600px){.filters{padding:8px;gap:5px}select{max-width:47%}header{padding:10px}input{width:100%}}
-.locationbar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;padding:10px 16px;background:#e7f1ec;border-bottom:1px solid #cadcd2}.locationbar input[type=range]{min-width:120px;max-width:240px;flex:0}.locationbar input[type=checkbox]{min-width:0;max-width:none;flex:none;width:16px;height:16px;margin:0}.locationbar label{display:flex;align-items:center;gap:6px}.locationbar output{min-width:55px;font-weight:600}#locationStatus{width:100%;font-size:12px;color:#40594d}.brand-marker{background:transparent;border:0}.brand-badge{width:46px;height:42px;position:relative;border-radius:10px;box-shadow:0 2px 7px #0005;background:#fff;border:2px solid white;display:flex;align-items:center;justify-content:center}.brand-badge img{width:36px;height:30px;object-fit:contain}.brand-badge .fallback{font-size:10px;font-weight:800;text-align:center;overflow:hidden;padding:2px;color:#203e33}.status-dot{position:absolute;right:-4px;bottom:-4px;width:13px;height:13px;border:2px solid white;border-radius:50%}.user-location{width:18px;height:18px;border-radius:50%;background:#2477ed;border:3px solid white;box-shadow:0 0 0 4px #2477ed44}.distance{font-weight:700;color:#1757ad}.locationbar button[aria-pressed=true]{background:#bad6fb}.marker-note{font-size:11px;color:#617266}
+    <title>QuvvatUZ — Xarita</title>
 
-/* Quvvat: map-first interface */
-:root{--ink:#172c27;--green:#087f5b;--line:#e3ebe7;--shadow:0 8px 32px #17372a18}
-body{font:14px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);overflow:hidden;background:#e8eee9}
-#map{position:absolute;inset:0;z-index:0;height:100%;background:#e8eee9}
-header{position:absolute;left:24px;top:24px;z-index:500;width:350px;background:white;color:var(--ink);padding:18px 20px;border-radius:22px 22px 0 0;display:block;box-shadow:var(--shadow)}
-header h1{font-size:25px;letter-spacing:-1px}header span{display:block;font-size:12px;color:#72827a;margin-top:5px}
-.filters{position:absolute;top:107px;left:24px;width:350px;z-index:501;padding:0 16px 16px;background:white;border:0;border-radius:0 0 22px 22px;gap:8px;box-shadow:0 15px 25px #17372a12}
-input,select,button{min-height:44px;border-radius:12px;border:1px solid var(--line);color:var(--ink);background:#f5f8f6;font:inherit;transition:background .15s,box-shadow .15s}button:hover{background:#e5f2eb}button:disabled{cursor:default;opacity:.45}button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #65bda1;outline-offset:3px}
-.filters input{width:100%;flex-basis:100%;min-width:0;padding:13px 14px;font-size:15px}.filters select{width:calc(50% - 4px);max-width:none;min-width:0;flex:1;font-size:12px}
-.locationbar{position:absolute;left:24px;bottom:28px;z-index:500;width:350px;background:white;padding:14px;border-radius:20px;box-shadow:var(--shadow);border:1px solid #ffffffa0;display:block;max-height:calc(100dvh - 260px);overflow:auto}
-#locate{width:100%;background:var(--green);color:white;font-weight:650;border:0;min-height:48px}#locate:hover{background:#066d4e}
-.locationbar details{margin-top:8px}.locationbar summary{cursor:pointer;padding:10px 4px;font-weight:600;list-style:none;display:flex;justify-content:space-between}.locationbar summary:after{content:'＋';color:var(--green)}.locationbar details[open] summary:after{content:'−'}
-.location-options{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding-top:6px}.location-options button{font-size:12px;flex:1}.location-options #markerStyle{width:100%;max-width:none}.location-options input[type=range]{min-width:110px;max-width:none;flex:1;accent-color:var(--green);padding:0;border:0;min-height:32px}.location-options input[type=checkbox]{accent-color:var(--green)}.location-options label[for=radius]{flex-basis:100%;font-size:12px;font-weight:600}.location-options label:has(#nearby){flex-basis:100%;font-size:12px}#locationStatus:empty{display:none}#locationStatus{margin-top:10px;line-height:1.5}
-#emptyResult,#notice{position:absolute;top:24px;left:50%;transform:translateX(-20%);z-index:600;max-width:420px;border-radius:14px;background:white;box-shadow:var(--shadow);padding:14px 18px}#notice{background:#fff5d8}
-.leaflet-top.leaflet-right{top:14px;right:14px}.leaflet-bar{border:0!important;box-shadow:var(--shadow)!important;border-radius:15px!important;overflow:hidden}.leaflet-bar a{width:44px!important;height:44px!important;line-height:44px!important;color:var(--ink)!important;border-color:var(--line)!important}.leaflet-control-attribution{font-size:9px!important;background:#ffffffd9!important}
-.brand-badge{border-radius:14px;box-shadow:0 3px 12px #17372a30;border:2px solid white}.brand-badge:hover{transform:translateY(-3px)}.cluster-pin{border:4px solid white;background:#087f5b;color:white;border-radius:50%;width:44px;height:44px;display:grid;place-items:center;font-weight:700;font-size:13px;box-shadow:0 3px 14px #17372a38}
-#stationPanel{position:absolute;z-index:700;top:24px;right:82px;width:360px;max-height:calc(100dvh - 56px);overflow:auto;padding:24px;background:white;border-radius:24px;box-shadow:var(--shadow);line-height:1.65}#stationPanel[hidden]{display:none}#closeStation{position:sticky;top:0;float:right;box-sizing:border-box;width:44px;height:44px;min-width:44px;min-height:44px;padding:0;display:grid;place-items:center;line-height:1;border-radius:50%;font-size:22px;background:#f1f5f2;margin:-10px -10px 4px 8px}#stationContent>b:first-child{font-size:22px;line-height:1.3;display:inline-block;margin-bottom:10px;max-width:260px}#stationContent a{font-weight:600;text-decoration:none}#stationContent>p:last-child{padding:14px;background:#eaf6ef;border-radius:12px;margin-bottom:0}.card{padding:14px 0}.warning{font-size:12px}.muted{font-size:12px}
-@media(max-width:700px){header{top:12px;left:12px;width:calc(100% - 76px);padding:12px 16px;border-radius:18px 18px 0 0}header h1{font-size:21px}header span{display:none}.filters{top:61px;left:12px;width:calc(100% - 76px);padding:0 12px 12px;border-radius:0 0 18px 18px}.filters input{font-size:14px;padding:10px}.filters select{font-size:11px}.locationbar{left:12px;bottom:26px;width:calc(100% - 24px);padding:12px;border-radius:18px;max-height:45dvh}.locationbar details{margin-top:2px}.locationbar summary{padding-bottom:0}#stationPanel{top:auto;right:8px;left:8px;bottom:20px;width:auto;max-height:58dvh;border-radius:24px;padding:22px}#emptyResult,#notice{top:180px;left:12px;transform:none;max-width:calc(100% - 24px)}.leaflet-top.leaflet-right{top:2px;right:2px}.leaflet-bar a{width:40px!important;height:40px!important;line-height:40px!important}#locationStatus{font-size:11px}}
-@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
-.yandex-marker{display:block;position:absolute;min-height:0;padding:0;border:0;background:transparent;cursor:pointer;overflow:visible}.yandex-marker:hover{background:transparent}.color-marker{display:block;width:16px;height:16px;border:2px solid white;border-radius:50%;box-shadow:0 2px 6px #0004}.map-tools{position:absolute;right:16px;top:24px;z-index:500;display:grid;gap:3px;box-shadow:var(--shadow);border-radius:14px;overflow:hidden}.map-tools button{width:44px;border:0;border-radius:0;background:white;font-size:23px;font-weight:600}.map-tools #tiltMap{font-size:14px}.map-tools button[aria-pressed=true]{background:#087f5b;color:white}.data-credit{position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-size:8px;z-index:400;background:#ffffffcc;padding:2px 4px;white-space:nowrap}.locationbar{bottom:44px}#notice:empty{display:none}@media(max-width:700px){.map-tools{right:12px;top:12px}.map-tools button{width:40px}.locationbar{bottom:48px}#stationPanel{bottom:42px}.data-credit{bottom:25px;font-size:7px}}
-body{height:var(--tg-viewport-stable-height,100dvh)}.locationbar{bottom:calc(28px + env(safe-area-inset-bottom,0px))}#stationPanel{max-height:calc(var(--tg-viewport-stable-height,100dvh) - 56px)}@media(max-width:700px){.locationbar{bottom:calc(26px + env(safe-area-inset-bottom,0px))}#stationPanel{bottom:calc(20px + env(safe-area-inset-bottom,0px));max-height:58dvh}}
-</style></head><body>
-<header><h1>⚡️ Quvvat</h1><span>Yo‘lingizdagi quvvat</span></header>
-<div class="locationbar"><button id="locate">📍 Mening joylashuvim</button><details><summary>Qidiruv sozlamalari</summary><div class="location-options"><button id="pickLocation" aria-pressed="false">Xaritadan markaz tanlash</button><button id="clearLocation" disabled>Joylashuvni tozalash</button><label for="radius">Radius</label><input id="radius" aria-label="Qidiruv radiusi" type="range" min="100" max="2000" step="100" value="1000" disabled><output id="radiusLabel" for="radius">1 km</output><label><input id="nearby" type="checkbox" disabled> Faqat shu radiusda</label><select id="markerStyle" aria-label="Xarita belgilari"><option value="logo">Kompaniya logotiplari</option><option value="status">Holat ranglari</option></select></div></details><div id="locationStatus" role="status"></div></div>
-<div class="filters"><input id="search" aria-label="Stansiya yoki manzil" placeholder="Stansiya yoki manzilni qidiring"><select id="op" aria-label="Operator"><option value="">Barcha operatorlar</option></select><select id="region" aria-label="Viloyat"><option value="">Barcha viloyatlar</option></select></div>
-<div id="emptyResult" role="status" hidden></div><div id="notice" role="status" style="display:block">Yandex xaritasi yuklanmoqda…</div><nav class="map-tools" aria-label="Xarita boshqaruvi"><button id="zoomIn" aria-label="Yaqinlashtirish">+</button><button id="zoomOut" aria-label="Uzoqlashtirish">−</button><button id="tiltMap" aria-label="Xaritani qiya ko‘rish" aria-pressed="false">3D</button></nav><div class="data-credit">Stansiyalar: geoBoundaries · Yandex · <a href="https://openchargemap.org/poi/details/459383" target="_blank" rel="noopener noreferrer">OCM CC BY 4.0</a></div><div id="map" aria-label="Zaryadlash stansiyalari xaritasi"></div><aside id="stationPanel" aria-label="Stansiya ma’lumotlari" hidden><button id="closeStation" aria-label="Yopish">×</button><div id="stationContent"></div></aside>
-<script src="./stations-data.js"></script>
-<script>
-async function initQuvvat(){
- if(location.hostname==='127.0.0.1'){const url=new URL(location.href);url.hostname='localhost';location.replace(url.href);return;}
- const apiKey="90f58cc0-cad8-448e-82da-c79bb5b3ac62";
- if(!apiKey)throw new Error('missing-key');
- await new Promise((resolve,reject)=>{const script=document.createElement('script');const timeout=setTimeout(()=>reject(new Error('timeout')),25000);script.src='https://api-maps.yandex.ru/v3/?apikey='+encodeURIComponent(apiKey)+'&lang=ru_RU';script.onload=()=>{clearTimeout(timeout);resolve();};script.onerror=()=>{clearTimeout(timeout);reject(new Error('api-load'));};document.head.appendChild(script);});
- await Promise.race([ymaps3.ready,new Promise((_,reject)=>setTimeout(()=>reject(new Error('timeout')),25000))]);
+    <meta
+      name="description"
+      content="O‘zbekistondagi elektromobil zaryadlash stansiyalarini toping."
+    />
 
-let payload=window.QUVVAT_DATA, stations=payload.stations;
-payload.logos.beon= {
-  data_url: "./beon.png",
-  background: "#ffffff"
-};
-const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let userLocation=null,pickingLocation=false,locationRequest=0,userMarker=null,radiusCircle=null,accuracyCircle=null;
-function distanceMeters(a,b){const rad=x=>x*Math.PI/180,dp=rad(b.lat-a.lat),dl=rad(b.lon-a.lon),v=Math.sin(dp/2)**2+Math.cos(rad(a.lat))*Math.cos(rad(b.lat))*Math.sin(dl/2)**2;return 12742000*Math.asin(Math.sqrt(Math.max(0,Math.min(1,v))));}
-function distanceLabel(d){return d<1000?Math.round(d)+' m':(d/1000).toFixed(2)+' km';}
-const displayNames={tokbor:'TOK BOR',kwatt:'K Watt',energo:'EnerGo',spectre:'Spectre Energy',pulseev:'Pulse EV',nd:'ND Charger',quwatt:'Quwatt',yashil:'Yashil Energiya',trianon:'Trianon Energy',voltauto:'Voltauto',megawatt:'Megawatt Energy',mustang:'Mustang Energy'};
-const labels={available:'🟢 Bo‘sh',busy:'🔴 Band',unavailable:'⚫ Mavjud emas',faulted:'⚫ Nosoz',reserved:'🟠 Bron qilingan',unknown:'⚪ Noma’lum / eskirgan'};
-const now=()=>Date.now()/1000, fresh=r=>r.refresh_ok && Number(r.expires_at)>now();
-function canonical(t){return ({'CCS (Type 2)':'CCS2','GB_T_DC':'GB/T DC','GB_T_AC':'GB/T AC','CCS_2':'CCS2','IEC_62196_T1_COMBO':'CCS1'})[t]||t;}
-function specs(s){let all=[];for(const r of s.live||[]){for(const c of r.connectors||[])all.push({type:canonical(c.type),power:c.power_kw,price:fresh(r)&&c.price_unit==='Sum/kWh'?c.price:null});if(r.power_kw)all.push({power:r.power_kw,type:null});}for(const o of s.observations||[]){if(o.power_kw)all.push({power:o.power_kw,type:null});for(const c of o.connectors||[])all.push({type:canonical(c.type||c.type_code_as_reported),power:c.power_kw});}return all;}
-function connectorState(r,c){return fresh(r)&&c.expires_at>now()?c.status:'unknown';}
-function status(s){const states=[];for(const r of s.live||[]){if(!fresh(r)){states.push('unknown');continue;}if(r.availability_scope==='connector')states.push(...r.connectors.map(c=>connectorState(r,c)));else if(r.availability_scope==='site_count'){states.push(r.raw_status!=='active'?'unavailable':r.available_count>0?'available':'unknown');}else states.push(({available:'available',busy:'busy',unavailable:'unavailable'})[r.raw_status]||'unknown');}return states.includes('available')?'available':states.includes('busy')?'busy':states.includes('unknown')||!states.length?'unknown':states[0];}
-function options(id,values){const el=$(id),current=el.value;while(el.options.length>1)el.remove(1);[...new Set(values.filter(Boolean))].sort().forEach(v=>{let o=document.createElement('option');o.value=v;o.textContent=id==='op'?(displayNames[v]||v):v;el.appendChild(o)});el.value=[...el.options].some(o=>o.value===current)?current:'';}
-function updateOptions(){options('op',stations.map(s=>s.operator));options('region',stations.map(s=>s.region));}
-function showNotice(t){$('notice').style.display='block';$('notice').textContent=t;}
-// Small presentation adapter over the official Yandex Maps JS API v3.
-// Coordinates at the UI boundary are [latitude, longitude]; Yandex uses [longitude, latitude].
-class MapView {
- constructor(id){
-  this.element=document.getElementById(id);this.handlers={};this.lastZoom=6;
-  this.native=new ymaps3.YMap(this.element,{location:{center:[64.5,41.5],zoom:6},mode:'vector',zoomRange:{min:3,max:20}},[new ymaps3.YMapDefaultSchemeLayer({}),new ymaps3.YMapDefaultFeaturesLayer({})]);
-  this.native.addChild(new ymaps3.YMapListener({layer:'any',onUpdate:({location,mapInAction})=>{if(!mapInAction&&Math.abs(location.zoom-this.lastZoom)>.01){this.lastZoom=location.zoom;this.emit('zoomend');}},onClick:(object,event)=>{if(object?.type==='marker')return;this.emit('click',{latlng:{lat:event.coordinates[1],lng:event.coordinates[0]}});}}));
- }
- emit(event,value){for(const fn of this.handlers[event]||[])fn(value);}
- on(event,fn){(this.handlers[event]??=[]).push(fn);return this;}
- setView([lat,lon],zoom){this.native.setLocation({center:[lon,lat],zoom,duration:0});return this;}
- getZoom(){return this.native.zoom;}
- getContainer(){return this.element;}
- invalidateSize(){} // YMap observes its own container.
- project([lat,lon],zoom){const sin=Math.sin(Math.max(-85,Math.min(85,lat))*Math.PI/180),scale=256*2**zoom;return {x:(lon+180)/360*scale,y:(.5-Math.log((1+sin)/(1-sin))/(4*Math.PI))*scale};}
- fitBounds(points,options={}){
-  if(!points.length)return;const projected=points.map(p=>this.project(p,0)),xs=projected.map(p=>p.x),ys=projected.map(p=>p.y);
-  const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
-  const mobile=this.element.clientWidth<=700;
-  // Reserve space for the search panel and bottom location controls.
-  const left=mobile?24:395,right=70,top=mobile?185:40,bottom=mobile?175:50;
-  const width=Math.max(100,this.element.clientWidth-left-right),height=Math.max(100,this.element.clientHeight-top-bottom);
-  const zoom=Math.max(3,Math.min(options.maxZoom??18,Math.log2(width/Math.max(maxX-minX,.00001)),Math.log2(height/Math.max(maxY-minY,.00001))));
-  const scale=2**zoom,x=(minX+maxX)/2-(left-right)/(2*scale),y=(minY+maxY)/2-(top-bottom)/(2*scale);
-  const lon=x/256*360-180,lat=Math.atan(Math.sinh(Math.PI*(1-2*y/256)))*180/Math.PI;
-  this.setView([lat,lon],zoom);
- }
- removeLayer(item){item?.remove();}
-}
-class MapGroup {
- constructor(){this.items=[];}
- addTo(map){this.map=map;return this;}
- clearLayers(){for(const item of this.items)item.remove();this.items=[];}
-}
-class MapObject {
- addTo(target){this.map=target instanceof MapGroup?target.map:target;if(target instanceof MapGroup)target.items.push(this);this.map.native.addChild(this.entity);return this;}
- remove(){if(this.map){this.map.native.removeChild(this.entity);this.map=null;}}
-}
-class StationMarker extends MapObject {
- constructor([lat,lon],options={}){
-  super();const icon=options.icon||{};this.element=document.createElement('button');this.element.type='button';this.element.className='yandex-marker '+(icon.className||'');
-  this.element.style.cssText='width:'+(icon.iconSize?.[0]||18)+'px;height:'+(icon.iconSize?.[1]||18)+'px;transform:translate(-50%,-50%);';
-  this.element.innerHTML=icon.html||'';this.element.title=options.title||options.alt||'Stansiya';this.element.setAttribute('aria-label',this.element.title);
-  this.entity=new ymaps3.YMapMarker({coordinates:[lon,lat],zIndex:options.zIndexOffset||0},this.element);
- }
- on(event,fn){this.element.addEventListener(event,e=>{e.stopPropagation();fn(e);});return this;}
- bindTooltip(text){const el=document.createElement('span');el.innerHTML=text;this.element.title=el.textContent;return this;}
- bindPopup(text){this.element.title=String(text);return this;}
- setPopupContent(text){return this.bindTooltip(text);}
-}
-class RadiusOverlay extends MapObject {
- constructor([lat,lon],options){
-  super();const radius=options.radius,angular=radius/6371000,phi=lat*Math.PI/180,lambda=lon*Math.PI/180,points=[];
-  for(let i=0;i<=96;i++){const bearing=i*2*Math.PI/96,p=Math.asin(Math.sin(phi)*Math.cos(angular)+Math.cos(phi)*Math.sin(angular)*Math.cos(bearing)),l=lambda+Math.atan2(Math.sin(bearing)*Math.sin(angular)*Math.cos(phi),Math.cos(angular)-Math.sin(phi)*Math.sin(p));points.push([l*180/Math.PI,p*180/Math.PI]);}
-  this.bounds=points.map(([lon,lat])=>[lat,lon]);
-  this.entity=new ymaps3.YMapFeature({geometry:{type:'Polygon',coordinates:[points]},style:{stroke:[{color:options.color||'#2477ed',width:options.weight||2}],fill:'rgba(36,119,237,'+(options.fillOpacity??.06)+')'}});
- }
- getBounds(){return this.bounds;}
-}
-const MapUI={map:id=>new MapView(id),layerGroup:()=>new MapGroup(),divIcon:options=>options,marker:(point,options)=>new StationMarker(point,options),circle:(point,options)=>new RadiusOverlay(point,options),circleMarker:(point,options)=>new StationMarker(point,{icon:{iconSize:[18,18],html:'<span class="color-marker" style="background:'+options.fillColor+'"></span>'}})};
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-const map=MapUI.map('map',{zoomControl:false}).setView([41.5,64.5],6),layer=MapUI.layerGroup().addTo(map);
-$('zoomIn').addEventListener('click',()=>map.native.setLocation({zoom:Math.min(20,map.getZoom()+1),duration:200}));$('zoomOut').addEventListener('click',()=>map.native.setLocation({zoom:Math.max(3,map.getZoom()-1),duration:200}));$('tiltMap').addEventListener('click',()=>{const enabled=$('tiltMap').getAttribute('aria-pressed')!=='true';$('tiltMap').setAttribute('aria-pressed',String(enabled));map.native.update({camera:{tilt:enabled?40*Math.PI/180:0,duration:300}});});
-let selectedStation=null;
-function showStation(s){selectedStation=s;$('stationContent').innerHTML=popup(s);$('stationPanel').hidden=false;$('closeStation').focus({preventScroll:true});}
-function closeStation(){$('stationPanel').hidden=true;selectedStation=null;}
-$('closeStation').addEventListener('click',closeStation);document.addEventListener('keydown',e=>{if(e.key==='Escape')closeStation();});
-let resizeTimer;new ResizeObserver(()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{map.invalidateSize({pan:true});if(userLocation&&$('nearby').checked&&radiusCircle)map.fitBounds(radiusCircle.getBounds(),{padding:[35,35],maxZoom:18,animate:false});},100);}).observe($('map'));
+    <style>
+      * {
+        box-sizing: border-box;
+      }
 
-function timeLabel(t){const d=new Date(t);return t&&!isNaN(d)?d.toLocaleString('uz-UZ',{timeZone:'Asia/Tashkent'}):'Sana noma’lum';}
-// Operator tariffs supplied by the project owner on 2026-11-16; UZS/kWh.
-const operatorTariffs={
-  "tokbor": {
-    "day": 2950,
-    "night": 1900
-  },
-  "kwatt": {
-    "day": 2350,
-    "night": 1900
-  },
-  "mustang": {
-    "day": 2200,
-    "night": 1700
-  },
-  "spectre": {
-    "day": 2350,
-    "night": 1900
-  },
-  "megawatt": {
-    "day": 2333,
-    "night": 1900
-  },
-  "nd": {
-    "day": 2300,
-    "night": 1800
-  },
-  "trianon": {
-    "day": 1990,
-    "night": 1790
-  },
-  "yashil": {
-    "day": 1800,
-    "night": 1800
-  },
-  "energo": {
-    "day": 2000,
-    "night": 1700
-  },
-  "amppal": {
-    "day": 2300,
-    "night": 1800,
-    "estimated": true
-  },
-  "apollix": {
-    "day": 2300,
-    "night": 1800,
-    "estimated": true
-  },
-  "beon": {
-    "day": 2300,
-    "night": 1800,
-    "estimated": true
-  },
-  "ebb": {
-    "day": 2300,
-    "night": 1800,
-    "estimated": true
-  },
-  "greente": {
-    "day": 2300,
-    "night": 1800,
-    "estimated": true
-  },
-  "protok": {
-    "day": 2300,
-    "night": 1800,
-    "estimated": true
-  },
-  "pulseev": {
-    "day": 2300,
-    "night": 1800,
-    "estimated": true
-  },
-  "quwatt": {
-    "day": 2300,
-    "night": 1800,
-    "estimated": true
-  },
-  "telecom": {
-    "day": 2300,
-    "night": 1800,
-    "estimated": true
-  },
-  "uenergy": {
-    "day": 2300,
-    "night": 1800,
-    "estimated": true
-  },
-  "urbanpower": {
-    "day": 2300,
-    "night": 1800,
-    "estimated": true
-  },
-  "voltauto": {
-    "day": 2300,
-    "night": 1800,
-    "estimated": true
-  },
-  "zty": {
-    "day": 2300,
-    "night": 1800,
-    "estimated": true
-  }
-};
-function popup(s){
- const tariffs=s.manual_tariffs||operatorTariffs[s.operator]||{};
- function price(period){
-  const amount=tariffs[period];
-  if(typeof amount!=='number'||!Number.isFinite(amount)||amount<0)return '&nbsp;';
-  return esc(amount.toLocaleString('uz-UZ'))+' so‘m/kWh'+(tariffs.estimated?' <span class="muted">(Taxminiy)</span>':'');
- }
- const heading='<b>'+esc(s.name||'Stansiya')+'</b><br><span>'+esc(s.address||s.region||'')+'</span>';
- const coords=encodeURIComponent(s.lat+','+s.lon);
- const links='<p><a target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&destination='+coords+'">Google yo‘nalish</a> · <a target="_blank" rel="noopener noreferrer" href="https://yandex.com/maps/?rtext=~'+coords+'&rtt=auto">Yandex yo‘nalish</a></p>';
- return heading+'<div class="tariff-only"><p><b>Kunduzgi narx</b><br>'+price('day')+'</p><p><b>Kechki narx</b><br>'+price('night')+'</p></div>'+links;
-}
-let markers=[];
-function matches(s){if(userLocation&&$('nearby').checked&&distanceMeters(userLocation,s)>Number($('radius').value))return false;if($('op').value&&s.operator!==$('op').value)return false;if($('region').value&&s.region!==$('region').value)return false;const q=$('search').value.toLocaleLowerCase();if(q&&!(s.name+' '+s.address+' '+s.operator).toLocaleLowerCase().includes(q))return false;
-return true;}
-function draw(fit=false){layer.clearLayers();markers=[];let list=stations.filter(matches);list.sort(userLocation?(a,b)=>distanceMeters(userLocation,a)-distanceMeters(userLocation,b):(a,b)=>String(a.name).localeCompare(String(b.name)));const colors={available:'#0a9664',busy:'#d95049',unknown:'#7b8790',unavailable:'#343c43',reserved:'#db9521',faulted:'#343c43'};
-let visible=list;
-if(map.getZoom()<16){const groups=new Map();for(const s of list){const p=map.project([s.lat,s.lon],map.getZoom()),key=Math.floor(p.x/64)+':'+Math.floor(p.y/64);if(!groups.has(key))groups.set(key,[]);groups.get(key).push(s);}visible=[];for(const group of groups.values()){if(group.length===1){visible.push(group[0]);continue;}const lat=group.reduce((a,s)=>a+s.lat,0)/group.length,lon=group.reduce((a,s)=>a+s.lon,0)/group.length;MapUI.marker([lat,lon],{title:group.length+' ta stansiya — yaqinlashtirish',icon:MapUI.divIcon({className:'',html:'<div class="cluster-pin">'+group.length+'</div>',iconSize:[44,44],iconAnchor:[22,22]})}).on('click',()=>map.setView([lat,lon],Math.min(16,map.getZoom()+2))).addTo(layer);}}
-for(const s of visible){const state=status(s),fill=colors[state]||colors.unknown,brand=(payload.logos||{})[s.operator];let m;
-if($('markerStyle').value==='logo'){const title=displayNames[s.operator]||s.operator,initial=s.operator==="noma'lum"?'?':title.split(/\s+/).map(w=>w[0]).join('').slice(0,3).toUpperCase();const content=brand&&brand.data_url?'<img src="'+esc(brand.data_url)+'" alt="'+esc(title)+'">':'<span class="fallback">'+esc(initial)+'</span>';m=MapUI.marker([s.lat,s.lon],{title:title+' — '+s.name,alt:title,icon:MapUI.divIcon({className:'brand-marker',html:'<div class="brand-badge" style="background:'+esc(brand?.background||'#ffffff')+'">'+content+'<span class="status-dot" style="background:'+fill+'"></span></div>',iconSize:[46,42],iconAnchor:[23,21],popupAnchor:[0,-22]})});}else m=MapUI.circleMarker([s.lat,s.lon],{radius:6,color:'#fff',weight:1.2,fillColor:fill,fillOpacity:.9});m.on('click',()=>showStation(s)).bindTooltip(esc((displayNames[s.operator]||s.operator)+' — '+s.name)).addTo(layer);markers.push({s,m});}
-if(fit&&userLocation&&$('nearby').checked&&radiusCircle){map.fitBounds(radiusCircle.getBounds(),{padding:[35,35],maxZoom:18,animate:false});}else if(fit&&list.length)map.fitBounds(list.map(s=>[s.lat,s.lon]),{padding:[25,25],maxZoom:14,animate:false});
-if(selectedStation&&!list.includes(selectedStation))closeStation();else if(selectedStation)$('stationContent').innerHTML=popup(selectedStation);$('emptyResult').hidden=!!list.length;$('emptyResult').textContent=list.length?'':'Bu hududda stansiya topilmadi. Radius yoki filtrni o‘zgartiring.';}
-map.on('zoomend',()=>draw(false));
-function redrawLocation(){if(radiusCircle)map.removeLayer(radiusCircle);if(!userLocation)return;radiusCircle=MapUI.circle([userLocation.lat,userLocation.lon],{radius:Number($('radius').value),color:'#2477ed',weight:2,fillColor:'#2477ed',fillOpacity:.06,interactive:false}).addTo(map);}
-// Local landmark lookup: never present a nearby station's address as the exact GPS address.
-function locationName(point){
- let closest=null,best=Infinity;
- for(const station of stations){
-  if(!Number.isFinite(station.lat)||!Number.isFinite(station.lon))continue;
-  const address=String(station.address||'').trim(),name=String(station.name||'').trim();
-  if(!address&&!name)continue;
-  const distance=distanceMeters(point,station);
-  if(distance<best){closest=station;best=distance;}
- }
- if(!closest||best>2000)return point.manual?'Xaritadan tanlangan joy':'Joylashuvingiz xaritada belgilandi';
- const parts=[closest.region,closest.address||closest.name].filter(Boolean);
- return [...new Set(parts)].join(', ')+' yaqinida';
-}
-function setLocation(lat,lon,accuracy,manual){userLocation={lat,lon,accuracy,manual};if(userMarker)map.removeLayer(userMarker);if(accuracyCircle)map.removeLayer(accuracyCircle);accuracyCircle=null;userMarker=MapUI.marker([lat,lon],{icon:MapUI.divIcon({className:'',html:'<div class="user-location"></div>',iconSize:[18,18],iconAnchor:[9,9]}),zIndexOffset:1000,title:manual?'Tanlangan markaz':'Mening joylashuvim'}).addTo(map).bindPopup(manual?'Xaritadan tanlangan markaz':'Sizning taxminiy joylashuvingiz');if(!manual&&Number.isFinite(accuracy))accuracyCircle=MapUI.circle([lat,lon],{radius:accuracy,color:'#2477ed',weight:1,dashArray:'4 4',fillOpacity:.03,interactive:false}).addTo(map);$('nearby').disabled=false;$('nearby').checked=true;$('radius').disabled=false;$('clearLocation').disabled=false;const address=locationName(userLocation);$('locationStatus').textContent=(manual?'Tanlangan joy: ':'Siz turgan joy: ')+address;userMarker.setPopupContent(esc(address));redrawLocation();draw(true);}
+      body {
+        margin: 0;
+        font: 14px system-ui;
+        color: #182b26;
+        background: #f3f7f5;
+        height: 100dvh;
+        display: flex;
+        flex-direction: column;
+      }
 
-const tg=window.Telegram?.WebApp;
-if(tg?.initData){tg.ready();tg.expand();tg.setHeaderColor('#ffffff');tg.setBackgroundColor('#f3f7f5');if(tg.isVersionAtLeast('7.7'))tg.disableVerticalSwipes();}
-function miniAppLocation(success,failure,options){
- const lm=tg?.LocationManager;
- if(tg?.initData&&tg.isVersionAtLeast('8.0')&&lm){
-  lm.init(()=>{if(!lm.isLocationAvailable){browserLocation();return;}lm.getLocation(p=>{if(p)success({coords:{latitude:p.latitude,longitude:p.longitude,accuracy:p.horizontal_accuracy}});else failure({code:1});});});
- }else browserLocation();
- function browserLocation(){if(navigator.geolocation)navigator.geolocation.getCurrentPosition(success,failure,options);else failure({code:2});}
-}
+      header {
+        background: #123c32;
+        color: white;
+        padding: 14px 18px;
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
 
-$('locate').addEventListener('click',()=>{if(!navigator.geolocation&&!window.Telegram?.WebApp?.LocationManager){$('locationStatus').textContent='Brauzer joylashuvni qo‘llamaydi. Markazni xaritadan tanlang.';return;}pickingLocation=false;$('pickLocation').setAttribute('aria-pressed','false');map.getContainer().style.cursor='';const request=++locationRequest;$('locate').disabled=true;$('locationStatus').textContent='Joylashuv aniqlanmoqda… Brauzer ruxsatini tasdiqlang.';miniAppLocation(p=>{if(request!==locationRequest)return;$('locate').disabled=false;setLocation(p.coords.latitude,p.coords.longitude,p.coords.accuracy,false);},e=>{if(request!==locationRequest)return;$('locate').disabled=false;$('locationStatus').textContent=({1:'Joylashuvga ruxsat berilmadi. Brauzer ruxsatini tekshiring yoki markazni xaritadan tanlang.',2:'Joylashuvni aniqlab bo‘lmadi. Markazni xaritadan tanlang.',3:'Joylashuvni aniqlash vaqti tugadi. Qayta urinib ko‘ring yoki markazni tanlang.'})[e.code]||'Joylashuv olinmadi.';},{enableHighAccuracy:true,timeout:15000,maximumAge:0});});
-$('pickLocation').addEventListener('click',()=>{pickingLocation=!pickingLocation;$('pickLocation').setAttribute('aria-pressed',String(pickingLocation));map.getContainer().style.cursor=pickingLocation?'crosshair':'';if(pickingLocation)$('locationStatus').textContent='Qidiruv markazi uchun xaritadagi kerakli joyni bosing.';});
-map.on('click',e=>{if(!pickingLocation)return;locationRequest++;$('locate').disabled=false;pickingLocation=false;$('pickLocation').setAttribute('aria-pressed','false');map.getContainer().style.cursor='';setLocation(e.latlng.lat,e.latlng.lng,null,true);});
-$('clearLocation').addEventListener('click',()=>{locationRequest++;userLocation=null;pickingLocation=false;$('pickLocation').setAttribute('aria-pressed','false');map.getContainer().style.cursor='';$('locate').disabled=false;for(const item of [userMarker,radiusCircle,accuracyCircle])if(item)map.removeLayer(item);userMarker=radiusCircle=accuracyCircle=null;$('nearby').checked=false;$('nearby').disabled=true;$('radius').disabled=true;$('clearLocation').disabled=true;$('locationStatus').textContent='Joylashuv tozalandi.';draw(true);});
-$('radius').addEventListener('input',()=>{$('radiusLabel').textContent=distanceLabel(Number($('radius').value));redrawLocation();draw(false);});
-$('radius').addEventListener('change',()=>draw(true));$('nearby').addEventListener('change',()=>draw(true));$('markerStyle').addEventListener('change',()=>draw(false));
-for(const id of ['op','region'])$(id).addEventListener('change',()=>draw(true));$('search').addEventListener('input',()=>draw(true));
+      h1 {
+        font-size: 22px;
+        margin: 0;
+      }
 
-updateOptions();draw(true);setInterval(()=>draw(false),30000);
-$('notice').style.display='none';
-}
-initQuvvat().catch(()=>{const el=document.getElementById('notice');el.style.display='block';el.textContent='Yandex xaritasi yuklanmadi. Internetni va API kalitidagi localhost ruxsatini tekshiring. Yangi sozlama faollashishi 15 daqiqagacha davom etishi mumkin.';const actions=document.createElement('div');actions.style.marginTop='12px';const retry=document.createElement('button');retry.textContent='Qayta urinish';retry.onclick=()=>location.reload();const previous=document.createElement('a');previous.href='./map_previous.html';previous.textContent='Avvalgi xaritani ochish';previous.style.marginLeft='12px';actions.append(retry,previous);el.appendChild(actions);});
-</script></body></html>
+      header small {
+        opacity: 0.8;
+      }
+
+      .filters {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        padding: 12px 16px;
+        border-bottom: 1px solid #dce5e0;
+      }
+
+      select,
+      input,
+      button {
+        font: inherit;
+        padding: 9px;
+        border: 1px solid #b6cbc0;
+        border-radius: 7px;
+        background: white;
+      }
+
+      input {
+        min-width: 180px;
+        flex: 1;
+      }
+
+      button {
+        cursor: pointer;
+        background: #d6f5e3;
+      }
+
+      button:disabled {
+        opacity: 0.6;
+        cursor: wait;
+      }
+
+      #emptyResult {
+        padding: 8px 16px;
+      }
+
+      #map {
+        flex: 1;
+        min-height: 200px;
+      }
+
+      .leaflet-popup-content {
+        max-height: 390px;
+        overflow: auto;
+        width: 300px !important;
+      }
+
+      .card {
+        padding: 9px 0;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .muted {
+        color: #60756b;
+        font-size: 12px;
+      }
+
+      .warning {
+        background: #fff1cb;
+        padding: 8px;
+        border-radius: 5px;
+      }
+
+      .sources {
+        font-size: 11px;
+        margin-top: 6px;
+      }
+
+      .pill {
+        font-weight: 600;
+      }
+
+      #notice {
+        display: none;
+        background: #fff1cb;
+        padding: 10px 16px;
+      }
+
+      a {
+        color: #086543;
+      }
+
+      #sourceSummary {
+        font-size: 12px;
+        padding: 0 16px 8px;
+      }
+
+      .legend {
+        font-size: 12px;
+      }
+
+      @media (max-width: 600px) {
+        .filters {
+          padding: 8px;
+          gap: 5px;
+        }
+
+        select {
+          max-width: 47%;
+        }
+
+        header {
+          padding: 10px;
+        }
+
+        input {
+          width: 100%;
+        }
+      }
+
+      .locationbar {
+        display: flex;
+        gap: 9px;
+        align-items: center;
+        flex-wrap: wrap;
+        padding: 10px 16px;
+        background: #e7f1ec;
+        border-bottom: 1px solid #cadcd2;
+      }
+
+      .locationbar input[type="range"] {
+        min-width: 120px;
+        max-width: 240px;
+        flex: 0;
+      }
+
+      .locationbar input[type="checkbox"] {
+        min-width: 0;
+        max-width: none;
+        flex: none;
+        width: 16px;
+        height: 16px;
+        margin: 0;
+      }
+
+      .locationbar label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .locationbar output {
+        min-width: 55px;
+        font-weight: 600;
+      }
+
+      #locationStatus {
+        width: 100%;
+        font-size: 12px;
+        color: #40594d;
+      }
+
+      .brand-marker {
+        background: transparent;
+        border: 0;
+      }
+
+      .brand-badge {
+        width: 46px;
+        height: 42px;
+        position: relative;
+        border-radius: 10px;
+        box-shadow: 0 2px 7px #0005;
+        background: #fff;
+        border: 2px solid white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .brand-badge img {
+        width: 36px;
+        height: 30px;
+        object-fit: contain;
+      }
+
+      .brand-badge .fallback {
+        font-size: 10px;
+        font-weight: 800;
+        text-align: center;
+        overflow: hidden;
+        padding: 2px;
+        color: #203e33;
+      }
+
+      .status-dot {
+        position: absolute;
+        right: -4px;
+        bottom: -4px;
+        width: 13px;
+        height: 13px;
+        border: 2px solid white;
+        border-radius: 50%;
+      }
+
+      .user-location {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #2477ed;
+        border: 3px solid white;
+        box-shadow: 0 0 0 4px #2477ed44;
+      }
+
+      .distance {
+        font-weight: 700;
+        color: #1757ad;
+      }
+
+      .locationbar button[aria-pressed="true"] {
+        background: #bad6fb;
+      }
+
+      .marker-note {
+        font-size: 11px;
+        color: #617266;
+      }
+
+      /* Xarita interfeysi */
+
+      :root {
+        --ink: #172c27;
+        --green: #087f5b;
+        --line: #e3ebe7;
+        --shadow: 0 8px 32px #17372a18;
+      }
+
+      body {
+        font:
+          14px -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        color: var(--ink);
+        overflow: hidden;
+        background: #e8eee9;
+      }
+
+      #map {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        height: 100%;
+        background: #e8eee9;
+      }
+
+      header {
+        position: absolute;
+        left: 24px;
+        top: 24px;
+        z-index: 500;
+        width: 350px;
+        background: white;
+        color: var(--ink);
+        padding: 18px 20px;
+        border-radius: 22px 22px 0 0;
+        display: block;
+        box-shadow: var(--shadow);
+      }
+
+      header h1 {
+        font-size: 25px;
+        letter-spacing: -1px;
+      }
+
+      header span {
+        display: block;
+        font-size: 12px;
+        color: #72827a;
+        margin-top: 5px;
+      }
+
+      .filters {
+        position: absolute;
+        top: 107px;
+        left: 24px;
+        width: 350px;
+        z-index: 501;
+        padding: 0 16px 16px;
+        background: white;
+        border: 0;
+        border-radius: 0 0 22px 22px;
+        gap: 8px;
+        box-shadow: 0 15px 25px #17372a12;
+      }
+
+      input,
+      select,
+      button {
+        min-height: 44px;
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        color: var(--ink);
+        background: #f5f8f6;
+        font: inherit;
+        transition:
+          background 0.15s,
+          box-shadow 0.15s;
+      }
+
+      button:hover {
+        background: #e5f2eb;
+      }
+
+      button:disabled {
+        cursor: default;
+        opacity: 0.45;
+      }
+
+      button:focus-visible,
+      input:focus-visible,
+      select:focus-visible,
+      summary:focus-visible {
+        outline: 3px solid #65bda1;
+        outline-offset: 3px;
+      }
+
+      .filters input {
+        width: 100%;
+        flex-basis: 100%;
+        min-width: 0;
+        padding: 13px 14px;
+        font-size: 15px;
+      }
+
+      .filters select {
+        width: calc(50% - 4px);
+        max-width: none;
+        min-width: 0;
+        flex: 1;
+        font-size: 12px;
+      }
+
+      .locationbar {
+        position: absolute;
+        left: 24px;
+        bottom: 28px;
+        z-index: 500;
+        width: 350px;
+        background: white;
+        padding: 14px;
+        border-radius: 20px;
+        box-shadow: var(--shadow);
+        border: 1px solid #ffffffa0;
+        display: block;
+        max-height: calc(100dvh - 260px);
+        overflow: auto;
+      }
+
+      #locate {
+        width: 100%;
+        background: var(--green);
+        color: white;
+        font-weight: 650;
+        border: 0;
+        min-height: 48px;
+      }
+
+      #locate:hover {
+        background: #066d4e;
+      }
+
+      .locationbar details {
+        margin-top: 8px;
+      }
+
+      .locationbar summary {
+        cursor: pointer;
+        padding: 10px 4px;
+        font-weight: 600;
+        list-style: none;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .locationbar summary:after {
+        content: "＋";
+        color: var(--green);
+      }
+
+      .locationbar details[open] summary:after {
+        content: "−";
+      }
+
+      .location-options {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+        padding-top: 6px;
+      }
+
+      .location-options button {
+        font-size: 12px;
+        flex: 1;
+      }
+
+      .location-options #markerStyle {
+        width: 100%;
+        max-width: none;
+      }
+
+      .location-options input[type="range"] {
+        min-width: 110px;
+        max-width: none;
+        flex: 1;
+        accent-color: var(--green);
+        padding: 0;
+        border: 0;
+        min-height: 32px;
+      }
+
+      .location-options input[type="checkbox"] {
+        accent-color: var(--green);
+      }
+
+      .location-options label[for="radius"] {
+        flex-basis: 100%;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .location-options label:has(#nearby) {
+        flex-basis: 100%;
+        font-size: 12px;
+      }
+
+      #locationStatus:empty {
+        display: none;
+      }
+
+      #locationStatus {
+        margin-top: 10px;
+        line-height: 1.5;
+      }
+
+      #emptyResult,
+      #notice {
+        position: absolute;
+        top: 24px;
+        left: 50%;
+        transform: translateX(-20%);
+        z-index: 600;
+        max-width: 420px;
+        border-radius: 14px;
+        background: white;
+        box-shadow: var(--shadow);
+        padding: 14px 18px;
+      }
+
+      #notice {
+        background: #fff5d8;
+      }
+
+      .leaflet-top.leaflet-right {
+        top: 14px;
+        right: 14px;
+      }
+
+      .leaflet-bar {
+        border: 0 !important;
+        box-shadow: var(--shadow) !important;
+        border-radius: 15px !important;
+        overflow: hidden;
+      }
+
+      .leaflet-bar a {
+        width: 44px !important;
+        height: 44px !important;
+        line-height: 44px !important;
+        color: var(--ink) !important;
+        border-color: var(--line) !important;
+      }
+
+      .leaflet-control-attribution {
+        font-size: 9px !important;
+        background: #ffffffd9 !important;
+      }
+
+      .brand-badge {
+        border-radius: 14px;
+        box-shadow: 0 3px 12px #17372a30;
+        border: 2px solid white;
+      }
+
+      .brand-badge:hover {
+        transform: translateY(-3px);
+      }
+
+      .cluster-pin {
+        border: 4px solid white;
+        background: #087f5b;
+        color: white;
+        border-radius: 50%;
+        width: 44px;
+        height: 44px;
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+        font-size: 13px;
+        box-shadow: 0 3px 14px #17372a38;
+      }
+
+      #stationPanel {
+        position: absolute;
+        z-index: 700;
+        top: 24px;
+        right: 82px;
+        width: 360px;
+        max-height: calc(100dvh - 56px);
+        overflow: auto;
+        padding: 24px;
+        background: white;
+        border-radius: 24px;
+        box-shadow: var(--shadow);
+        line-height: 1.65;
+      }
+
+      #stationPanel[hidden] {
+        display: none;
+      }
+
+      #closeStation {
+        position: sticky;
+        top: 0;
+        float: right;
+        box-sizing: border-box;
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        min-height: 44px;
+        padding: 0;
+        display: grid;
+        place-items: center;
+        line-height: 1;
+        border-radius: 50%;
+        font-size: 22px;
+        background: #f1f5f2;
+        margin: -10px -10px 4px 8px;
+      }
+
+      #stationContent > b:first-child {
+        font-size: 22px;
+        line-height: 1.3;
+        display: inline-block;
+        margin-bottom: 10px;
+        max-width: 260px;
+      }
+
+      #stationContent a {
+        font-weight: 600;
+        text-decoration: none;
+      }
+
+      #stationContent > p:last-child {
+        padding: 14px;
+        background: #eaf6ef;
+        border-radius: 12px;
+        margin-bottom: 0;
+      }
+
+      .card {
+        padding: 14px 0;
+      }
+
+      .warning {
+        font-size: 12px;
+      }
+
+      .muted {
+        font-size: 12px;
+      }
+
+      @media (max-width: 700px) {
+        header {
+          top: 12px;
+          left: 12px;
+          width: calc(100% - 76px);
+          padding: 12px 16px;
+          border-radius: 18px 18px 0 0;
+        }
+
+        header h1 {
+          font-size: 21px;
+        }
+
+        header span {
+          display: none;
+        }
+
+        .filters {
+          top: 61px;
+          left: 12px;
+          width: calc(100% - 76px);
+          padding: 0 12px 12px;
+          border-radius: 0 0 18px 18px;
+        }
+
+        .filters input {
+          font-size: 14px;
+          padding: 10px;
+        }
+
+        .filters select {
+          font-size: 11px;
+        }
+
+        .locationbar {
+          left: 12px;
+          bottom: 26px;
+          width: calc(100% - 24px);
+          padding: 12px;
+          border-radius: 18px;
+          max-height: 45dvh;
+        }
+
+        .locationbar details {
+          margin-top: 2px;
+        }
+
+        .locationbar summary {
+          padding-bottom: 0;
+        }
+
+        #stationPanel {
+          top: auto;
+          right: 8px;
+          left: 8px;
+          bottom: 20px;
+          width: auto;
+          max-height: 58dvh;
+          border-radius: 24px;
+          padding: 22px;
+        }
+
+        #emptyResult,
+        #notice {
+          top: 180px;
+          left: 12px;
+          transform: none;
+          max-width: calc(100% - 24px);
+        }
+
+        .leaflet-top.leaflet-right {
+          top: 2px;
+          right: 2px;
+        }
+
+        .leaflet-bar a {
+          width: 40px !important;
+          height: 40px !important;
+          line-height: 40px !important;
+        }
+
+        #locationStatus {
+          font-size: 11px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition: none !important;
+          scroll-behavior: auto !important;
+        }
+      }
+
+      .yandex-marker {
+        display: block;
+        position: absolute;
+        min-height: 0;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        cursor: pointer;
+        overflow: visible;
+      }
+
+      .yandex-marker:hover {
+        background: transparent;
+      }
+
+      .color-marker {
+        display: block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid white;
+        border-radius: 50%;
+        box-shadow: 0 2px 6px #0004;
+      }
+
+      .map-tools {
+        position: absolute;
+        right: 16px;
+        top: 24px;
+        z-index: 500;
+        display: grid;
+        gap: 3px;
+        box-shadow: var(--shadow);
+        border-radius: 14px;
+        overflow: hidden;
+      }
+
+      .map-tools button {
+        width: 44px;
+        border: 0;
+        border-radius: 0;
+        background: white;
+        font-size: 23px;
+        font-weight: 600;
+      }
+
+      .map-tools #tiltMap {
+        font-size: 14px;
+      }
+
+      .map-tools button[aria-pressed="true"] {
+        background: #087f5b;
+        color: white;
+      }
+
+      .data-credit {
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 8px;
+        z-index: 400;
+        background: #ffffffcc;
+        padding: 2px 4px;
+        white-space: nowrap;
+      }
+
+      .locationbar {
+        bottom: 44px;
+      }
+
+      #notice:empty {
+        display: none;
+      }
+
+      @media (max-width: 700px) {
+        .map-tools {
+          right: 12px;
+          top: 12px;
+        }
+
+        .map-tools button {
+          width: 40px;
+        }
+
+        .locationbar {
+          bottom: 48px;
+        }
+
+        #stationPanel {
+          bottom: 42px;
+        }
+
+        .data-credit {
+          bottom: 25px;
+          font-size: 7px;
+        }
+      }
+
+      body {
+        height: var(--tg-viewport-stable-height, 100dvh);
+      }
+
+      .locationbar {
+        bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+      }
+
+      #stationPanel {
+        max-height: calc(
+          var(--tg-viewport-stable-height, 100dvh) - 56px
+        );
+      }
+
+      @media (max-width: 700px) {
+        .locationbar {
+          bottom: calc(26px + env(safe-area-inset-bottom, 0px));
+        }
+
+        #stationPanel {
+          bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+          max-height: 58dvh;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <h1>⚡️ Quvvat</h1>
+      <span>Yo‘lingizdagi quvvat</span>
+    </header>
+
+    <div class="locationbar">
+      <button id="locate">
+        📍 Mening joylashuvim
+      </button>
+
+      <details>
+        <summary>Qidiruv sozlamalari</summary>
+
+        <div class="location-options">
+          <button
+            id="pickLocation"
+            aria-pressed="false"
+          >
+            Xaritadan markaz tanlash
+          </button>
+
+          <button id="clearLocation" disabled>
+            Joylashuvni tozalash
+          </button>
+
+          <label for="radius">Radius</label>
+
+          <input
+            id="radius"
+            aria-label="Qidiruv radiusi"
+            type="range"
+            min="100"
+            max="2000"
+            step="100"
+            value="1000"
+            disabled
+          />
+
+          <output id="radiusLabel" for="radius">
+            1 km
+          </output>
+
+          <label>
+            <input
+              id="nearby"
+              type="checkbox"
+              disabled
+            />
+            Faqat shu radiusda
+          </label>
+
+          <select
+            id="markerStyle"
+            aria-label="Xarita belgilari"
+          >
+            <option value="logo">
+              Kompaniya logotiplari
+            </option>
+            <option value="status">
+              Holat ranglari
+            </option>
+          </select>
+        </div>
+      </details>
+
+      <div id="locationStatus" role="status"></div>
+    </div>
+
+    <div class="filters">
+      <input
+        id="search"
+        aria-label="Stansiya yoki manzil"
+        placeholder="Stansiya yoki manzilni qidiring"
+      />
+
+      <select id="op" aria-label="Operator">
+        <option value="">Barcha operatorlar</option>
+      </select>
+
+      <select id="region" aria-label="Viloyat">
+        <option value="">Barcha viloyatlar</option>
+      </select>
+    </div>
+
+    <div id="emptyResult" role="status" hidden></div>
+
+    <div
+      id="notice"
+      role="status"
+      style="display: block"
+    >
+      Yandex xaritasi yuklanmoqda…
+    </div>
+
+    <nav
+      class="map-tools"
+      aria-label="Xarita boshqaruvi"
+    >
+      <button id="zoomIn" aria-label="Yaqinlashtirish">
+        +
+      </button>
+
+      <button id="zoomOut" aria-label="Uzoqlashtirish">
+        −
+      </button>
+
+      <button
+        id="tiltMap"
+        aria-label="Xaritani qiya ko‘rish"
+        aria-pressed="false"
+      >
+        3D
+      </button>
+    </nav>
+
+    <div class="data-credit">
+      Stansiyalar: geoBoundaries · Yandex ·
+      <a
+        href="https://openchargemap.org/poi/details/459383"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        OCM CC BY 4.0
+      </a>
+    </div>
+
+    <div
+      id="map"
+      aria-label="Zaryadlash stansiyalari xaritasi"
+    ></div>
+
+    <aside
+      id="stationPanel"
+      aria-label="Stansiya ma’lumotlari"
+      hidden
+    >
+      <button id="closeStation" aria-label="Yopish">
+        ×
+      </button>
+
+      <div id="stationContent"></div>
+    </aside>
+
+    <script src="./stations-data.js"></script>
+
+    <script>
+      async function initQuvvat() {
+        if (location.hostname === "127.0.0.1") {
+          const url = new URL(location.href);
+          url.hostname = "localhost";
+          location.replace(url.href);
+          return;
+        }
+
+        const apiKey = "90f58cc0-cad8-448e-82da-c79bb5b3ac62";
+
+        if (!apiKey) {
+          throw new Error("missing-key");
+        }
+
+        await new Promise((resolve, reject) => {
+          const script = document.createElement("script");
+
+          const timeout = setTimeout(
+            () => reject(new Error("timeout")),
+            25000
+          );
+
+          script.src =
+            "https://api-maps.yandex.ru/v3/?apikey=" +
+            encodeURIComponent(apiKey) +
+            "&lang=ru_RU";
+
+          script.onload = () => {
+            clearTimeout(timeout);
+            resolve();
+          };
+
+          script.onerror = () => {
+            clearTimeout(timeout);
+            reject(new Error("api-load"));
+          };
+
+          document.head.appendChild(script);
+        });
+
+        await Promise.race([
+          ymaps3.ready,
+          new Promise((_, reject) =>
+            setTimeout(
+              () => reject(new Error("timeout")),
+              25000
+            )
+          ),
+        ]);
+
+        let payload = window.QUVVAT_DATA;
+        let stations = payload.stations;
+
+        /* Qo‘shimcha kompaniya logotiplari */
+
+        payload.logos.beon = {
+          data_url: "./beon.png",
+          background: "#ffffff",
+        };
+
+        /* Yordamchi funksiyalar */
+
+        const $ = (id) => document.getElementById(id);
+
+        const esc = (s) =>
+          String(s ?? "").replace(
+            /[&<>"']/g,
+            (c) =>
+              ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;",
+              })[c]
+          );
+
+        let userLocation = null;
+        let pickingLocation = false;
+        let locationRequest = 0;
+        let userMarker = null;
+        let radiusCircle = null;
+        let accuracyCircle = null;
+
+        function distanceMeters(a, b) {
+          const rad = (x) => (x * Math.PI) / 180;
+          const dp = rad(b.lat - a.lat);
+          const dl = rad(b.lon - a.lon);
+
+          const v =
+            Math.sin(dp / 2) ** 2 +
+            Math.cos(rad(a.lat)) *
+              Math.cos(rad(b.lat)) *
+              Math.sin(dl / 2) ** 2;
+
+          return (
+            12742000 *
+            Math.asin(Math.sqrt(Math.max(0, Math.min(1, v))))
+          );
+        }
+
+        function distanceLabel(d) {
+          return d < 1000
+            ? Math.round(d) + " m"
+            : (d / 1000).toFixed(2) + " km";
+        }
+
+        const displayNames = {
+          tokbor: "TOK BOR",
+          kwatt: "K Watt",
+          energo: "EnerGo",
+          spectre: "Spectre Energy",
+          pulseev: "Pulse EV",
+          nd: "ND Charger",
+          quwatt: "Quwatt",
+          yashil: "Yashil Energiya",
+          trianon: "Trianon Energy",
+          voltauto: "Voltauto",
+          megawatt: "Megawatt Energy",
+          mustang: "Mustang Energy",
+        };
+
+        const labels = {
+          available: "🟢 Bo‘sh",
+          busy: "🔴 Band",
+          unavailable: "⚫ Mavjud emas",
+          faulted: "⚫ Nosoz",
+          reserved: "🟠 Bron qilingan",
+          unknown: "⚪ Noma’lum / eskirgan",
+        };
+
+        const now = () => Date.now() / 1000;
+
+        const fresh = (r) =>
+          r.refresh_ok && Number(r.expires_at) > now();
+
+        function canonical(t) {
+          return (
+            {
+              "CCS (Type 2)": "CCS2",
+              GB_T_DC: "GB/T DC",
+              GB_T_AC: "GB/T AC",
+              CCS_2: "CCS2",
+              IEC_62196_T1_COMBO: "CCS1",
+            }[t] || t
+          );
+        }
+
+        function specs(s) {
+          let all = [];
+
+          for (const r of s.live || []) {
+            for (const c of r.connectors || []) {
+              all.push({
+                type: canonical(c.type),
+                power: c.power_kw,
+                price:
+                  fresh(r) && c.price_unit === "Sum/kWh"
+                    ? c.price
+                    : null,
+              });
+            }
+
+            if (r.power_kw) {
+              all.push({
+                power: r.power_kw,
+                type: null,
+              });
+            }
+          }
+
+          for (const o of s.observations || []) {
+            if (o.power_kw) {
+              all.push({
+                power: o.power_kw,
+                type: null,
+              });
+            }
+
+            for (const c of o.connectors || []) {
+              all.push({
+                type: canonical(
+                  c.type || c.type_code_as_reported
+                ),
+                power: c.power_kw,
+              });
+            }
+          }
+
+          return all;
+        }
+
+        function connectorState(r, c) {
+          return fresh(r) && c.expires_at > now()
+            ? c.status
+            : "unknown";
+        }
+
+        function status(s) {
+          const states = [];
+
+          for (const r of s.live || []) {
+            if (!fresh(r)) {
+              states.push("unknown");
+              continue;
+            }
+
+            if (r.availability_scope === "connector") {
+              states.push(
+                ...r.connectors.map((c) =>
+                  connectorState(r, c)
+                )
+              );
+            } else if (
+              r.availability_scope === "site_count"
+            ) {
+              states.push(
+                r.raw_status !== "active"
+                  ? "unavailable"
+                  : r.available_count > 0
+                    ? "available"
+                    : "unknown"
+              );
+            } else {
+              states.push(
+                {
+                  available: "available",
+                  busy: "busy",
+                  unavailable: "unavailable",
+                }[r.raw_status] || "unknown"
+              );
+            }
+          }
+
+          return states.includes("available")
+            ? "available"
+            : states.includes("busy")
+              ? "busy"
+              : states.includes("unknown") || !states.length
+                ? "unknown"
+                : states[0];
+        }
+
+        function options(id, values) {
+          const el = $(id);
+          const current = el.value;
+
+          while (el.options.length > 1) {
+            el.remove(1);
+          }
+
+          [...new Set(values.filter(Boolean))]
+            .sort()
+            .forEach((v) => {
+              let o = document.createElement("option");
+              o.value = v;
+              o.textContent =
+                id === "op" ? displayNames[v] || v : v;
+              el.appendChild(o);
+            });
+
+          el.value = [...el.options].some(
+            (o) => o.value === current
+          )
+            ? current
+            : "";
+        }
+
+        function updateOptions() {
+          options(
+            "op",
+            stations.map((s) => s.operator)
+          );
+
+          options(
+            "region",
+            stations.map((s) => s.region)
+          );
+        }
+
+        function showNotice(t) {
+          $("notice").style.display = "block";
+          $("notice").textContent = t;
+        }
+
+        /*
+         * Interfeysda koordinatalar:
+         * [latitude, longitude]
+         *
+         * Yandex API ichida:
+         * [longitude, latitude]
+         */
+
+        class MapView {
+          constructor(id) {
+            this.element = document.getElementById(id);
+            this.handlers = {};
+            this.lastZoom = 6;
+
+            this.native = new ymaps3.YMap(
+              this.element,
+              {
+                location: {
+                  center: [64.5, 41.5],
+                  zoom: 6,
+                },
+                mode: "vector",
+                zoomRange: {
+                  min: 3,
+                  max: 20,
+                },
+              },
+              [
+                new ymaps3.YMapDefaultSchemeLayer({}),
+                new ymaps3.YMapDefaultFeaturesLayer({}),
+              ]
+            );
+
+            this.native.addChild(
+              new ymaps3.YMapListener({
+                layer: "any",
+
+                onUpdate: ({ location, mapInAction }) => {
+                  if (
+                    !mapInAction &&
+                    Math.abs(
+                      location.zoom - this.lastZoom
+                    ) > 0.01
+                  ) {
+                    this.lastZoom = location.zoom;
+                    this.emit("zoomend");
+                  }
+                },
+
+                onClick: (object, event) => {
+                  if (object?.type === "marker") return;
+
+                  this.emit("click", {
+                    latlng: {
+                      lat: event.coordinates[1],
+                      lng: event.coordinates[0],
+                    },
+                  });
+                },
+              })
+            );
+          }
+
+          emit(event, value) {
+            for (const fn of this.handlers[event] || []) {
+              fn(value);
+            }
+          }
+
+          on(event, fn) {
+            (this.handlers[event] ??= []).push(fn);
+            return this;
+          }
+
+          setView([lat, lon], zoom) {
+            this.native.setLocation({
+              center: [lon, lat],
+              zoom,
+              duration: 0,
+            });
+
+            return this;
+          }
+
+          getZoom() {
+            return this.native.zoom;
+          }
+
+          getContainer() {
+            return this.element;
+          }
+
+          invalidateSize() {
+            // YMap konteyner o‘lchamini o‘zi kuzatadi.
+          }
+
+          project([lat, lon], zoom) {
+            const sin = Math.sin(
+              (Math.max(-85, Math.min(85, lat)) * Math.PI) /
+                180
+            );
+
+            const scale = 256 * 2 ** zoom;
+
+            return {
+              x: ((lon + 180) / 360) * scale,
+              y:
+                (
+                  0.5 -
+                  Math.log((1 + sin) / (1 - sin)) /
+                    (4 * Math.PI)
+                ) * scale,
+            };
+          }
+
+          fitBounds(points, options = {}) {
+            if (!points.length) return;
+
+            const projected = points.map((p) =>
+              this.project(p, 0)
+            );
+
+            const xs = projected.map((p) => p.x);
+            const ys = projected.map((p) => p.y);
+
+            const minX = Math.min(...xs);
+            const maxX = Math.max(...xs);
+            const minY = Math.min(...ys);
+            const maxY = Math.max(...ys);
+
+            const mobile =
+              this.element.clientWidth <= 700;
+
+            const left = mobile ? 24 : 395;
+            const right = 70;
+            const top = mobile ? 185 : 40;
+            const bottom = mobile ? 175 : 50;
+
+            const width = Math.max(
+              100,
+              this.element.clientWidth - left - right
+            );
+
+            const height = Math.max(
+              100,
+              this.element.clientHeight - top - bottom
+            );
+
+            const zoom = Math.max(
+              3,
+              Math.min(
+                options.maxZoom ?? 18,
+                Math.log2(
+                  width / Math.max(maxX - minX, 0.00001)
+                ),
+                Math.log2(
+                  height / Math.max(maxY - minY, 0.00001)
+                )
+              )
+            );
+
+            const scale = 2 ** zoom;
+
+            const x =
+              (minX + maxX) / 2 -
+              (left - right) / (2 * scale);
+
+            const y =
+              (minY + maxY) / 2 -
+              (top - bottom) / (2 * scale);
+
+            const lon = (x / 256) * 360 - 180;
+
+            const lat =
+              (
+                Math.atan(
+                  Math.sinh(
+                    Math.PI * (1 - (2 * y) / 256)
+                  )
+                ) * 180
+              ) / Math.PI;
+
+            this.setView([lat, lon], zoom);
+          }
+
+          removeLayer(item) {
+            item?.remove();
+          }
+        }
+
+        class MapGroup {
+          constructor() {
+            this.items = [];
+          }
+
+          addTo(map) {
+            this.map = map;
+            return this;
+          }
+
+          clearLayers() {
+            for (const item of this.items) {
+              item.remove();
+            }
+
+            this.items = [];
+          }
+        }
+
+        class MapObject {
+          addTo(target) {
+            this.map =
+              target instanceof MapGroup
+                ? target.map
+                : target;
+
+            if (target instanceof MapGroup) {
+              target.items.push(this);
+            }
+
+            this.map.native.addChild(this.entity);
+            return this;
+          }
+
+          remove() {
+            if (this.map) {
+              this.map.native.removeChild(this.entity);
+              this.map = null;
+            }
+          }
+        }
+
+        class StationMarker extends MapObject {
+          constructor([lat, lon], options = {}) {
+            super();
+
+            const icon = options.icon || {};
+
+            this.element = document.createElement("button");
+            this.element.type = "button";
+
+            this.element.className =
+              "yandex-marker " + (icon.className || "");
+
+            this.element.style.cssText =
+              "width:" +
+              (icon.iconSize?.[0] || 18) +
+              "px;height:" +
+              (icon.iconSize?.[1] || 18) +
+              "px;transform:translate(-50%,-50%);";
+
+            this.element.innerHTML = icon.html || "";
+
+            this.element.title =
+              options.title || options.alt || "Stansiya";
+
+            this.element.setAttribute(
+              "aria-label",
+              this.element.title
+            );
+
+            this.entity = new ymaps3.YMapMarker(
+              {
+                coordinates: [lon, lat],
+                zIndex: options.zIndexOffset || 0,
+              },
+              this.element
+            );
+          }
+
+          on(event, fn) {
+            this.element.addEventListener(event, (e) => {
+              e.stopPropagation();
+              fn(e);
+            });
+
+            return this;
+          }
+
+          bindTooltip(text) {
+            const el = document.createElement("span");
+            el.innerHTML = text;
+            this.element.title = el.textContent;
+            return this;
+          }
+
+          bindPopup(text) {
+            this.element.title = String(text);
+            return this;
+          }
+
+          setPopupContent(text) {
+            return this.bindTooltip(text);
+          }
+        }
+
+        class RadiusOverlay extends MapObject {
+          constructor([lat, lon], options) {
+            super();
+
+            const radius = options.radius;
+            const angular = radius / 6371000;
+            const phi = (lat * Math.PI) / 180;
+            const lambda = (lon * Math.PI) / 180;
+            const points = [];
+
+            for (let i = 0; i <= 96; i++) {
+              const bearing = (i * 2 * Math.PI) / 96;
+
+              const p = Math.asin(
+                Math.sin(phi) * Math.cos(angular) +
+                  Math.cos(phi) *
+                    Math.sin(angular) *
+                    Math.cos(bearing)
+              );
+
+              const l =
+                lambda +
+                Math.atan2(
+                  Math.sin(bearing) *
+                    Math.sin(angular) *
+                    Math.cos(phi),
+                  Math.cos(angular) -
+                    Math.sin(phi) * Math.sin(p)
+                );
+
+              points.push([
+                (l * 180) / Math.PI,
+                (p * 180) / Math.PI,
+              ]);
+            }
+
+            this.bounds = points.map(
+              ([lon, lat]) => [lat, lon]
+            );
+
+            this.entity = new ymaps3.YMapFeature({
+              geometry: {
+                type: "Polygon",
+                coordinates: [points],
+              },
+
+              style: {
+                stroke: [
+                  {
+                    color: options.color || "#2477ed",
+                    width: options.weight || 2,
+                  },
+                ],
+                fill:
+                  "rgba(36,119,237," +
+                  (options.fillOpacity ?? 0.06) +
+                  ")",
+              },
+            });
+          }
+
+          getBounds() {
+            return this.bounds;
+          }
+        }
+
+        const MapUI = {
+          map: (id) => new MapView(id),
+
+          layerGroup: () => new MapGroup(),
+
+          divIcon: (options) => options,
+
+          marker: (point, options) =>
+            new StationMarker(point, options),
+
+          circle: (point, options) =>
+            new RadiusOverlay(point, options),
+
+          circleMarker: (point, options) =>
+            new StationMarker(point, {
+              icon: {
+                iconSize: [18, 18],
+                html:
+                  '<span class="color-marker" style="background:' +
+                  options.fillColor +
+                  '"></span>',
+              },
+            }),
+        };
+
+        const map = MapUI.map(
+          "map",
+          { zoomControl: false }
+        ).setView([41.5, 64.5], 6);
+
+        const layer = MapUI.layerGroup().addTo(map);
+
+        $("zoomIn").addEventListener("click", () => {
+          map.native.setLocation({
+            zoom: Math.min(20, map.getZoom() + 1),
+            duration: 200,
+          });
+        });
+
+        $("zoomOut").addEventListener("click", () => {
+          map.native.setLocation({
+            zoom: Math.max(3, map.getZoom() - 1),
+            duration: 200,
+          });
+        });
+
+        $("tiltMap").addEventListener("click", () => {
+          const enabled =
+            $("tiltMap").getAttribute("aria-pressed") !==
+            "true";
+
+          $("tiltMap").setAttribute(
+            "aria-pressed",
+            String(enabled)
+          );
+
+          map.native.update({
+            camera: {
+              tilt: enabled ? (40 * Math.PI) / 180 : 0,
+              duration: 300,
+            },
+          });
+        });
+
+        let selectedStation = null;
+
+        function showStation(s) {
+          selectedStation = s;
+          $("stationContent").innerHTML = popup(s);
+          $("stationPanel").hidden = false;
+
+          $("closeStation").focus({
+            preventScroll: true,
+          });
+        }
+
+        function closeStation() {
+          $("stationPanel").hidden = true;
+          selectedStation = null;
+        }
+
+        $("closeStation").addEventListener(
+          "click",
+          closeStation
+        );
+
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") {
+            closeStation();
+          }
+        });
+
+        let resizeTimer;
+
+        new ResizeObserver(() => {
+          clearTimeout(resizeTimer);
+
+          resizeTimer = setTimeout(() => {
+            map.invalidateSize({ pan: true });
+
+            if (
+              userLocation &&
+              $("nearby").checked &&
+              radiusCircle
+            ) {
+              map.fitBounds(radiusCircle.getBounds(), {
+                padding: [35, 35],
+                maxZoom: 18,
+                animate: false,
+              });
+            }
+          }, 100);
+        }).observe($("map"));
+
+        function timeLabel(t) {
+          const d = new Date(t);
+
+          return t && !isNaN(d)
+            ? d.toLocaleString("uz-UZ", {
+                timeZone: "Asia/Tashkent",
+              })
+            : "Sana noma’lum";
+        }
+
+        /*
+         * Kompaniyalar narxlari — so‘m/kWh.
+         * estimated: true bo‘lgan narxlar taxminiy.
+         */
+
+        const operatorTariffs = {
+          tokbor: {
+            day: 2950,
+            night: 1900,
+          },
+
+          kwatt: {
+            day: 2350,
+            night: 1900,
+          },
+
+          mustang: {
+            day: 2200,
+            night: 1700,
+          },
+
+          spectre: {
+            day: 2350,
+            night: 1900,
+          },
+
+          megawatt: {
+            day: 2333,
+            night: 1900,
+          },
+
+          nd: {
+            day: 2300,
+            night: 1800,
+          },
+
+          trianon: {
+            day: 1990,
+            night: 1790,
+          },
+
+          yashil: {
+            day: 1800,
+            night: 1800,
+          },
+
+          energo: {
+            day: 2000,
+            night: 1700,
+          },
+
+          amppal: {
+            day: 2300,
+            night: 1800,
+            estimated: true,
+          },
+
+          apollix: {
+            day: 2300,
+            night: 1800,
+            estimated: true,
+          },
+
+          beon: {
+            day: 2300,
+            night: 1800,
+            estimated: true,
+          },
+
+          ebb: {
+            day: 2300,
+            night: 1800,
+            estimated: true,
+          },
+
+          greente: {
+            day: 2300,
+            night: 1800,
+            estimated: true,
+          },
+
+          protok: {
+            day: 2300,
+            night: 1800,
+            estimated: true,
+          },
+
+          pulseev: {
+            day: 2300,
+            night: 1800,
+            estimated: true,
+          },
+
+          quwatt: {
+            day: 2300,
+            night: 1800,
+            estimated: true,
+          },
+
+          telecom: {
+            day: 2300,
+            night: 1800,
+            estimated: true,
+          },
+
+          uenergy: {
+            day: 2300,
+            night: 1800,
+            estimated: true,
+          },
+
+          urbanpower: {
+            day: 2300,
+            night: 1800,
+            estimated: true,
+          },
+
+          voltauto: {
+            day: 2300,
+            night: 1800,
+            estimated: true,
+          },
+
+          zty: {
+            day: 2300,
+            night: 1800,
+            estimated: true,
+          },
+        };
+
+        function popup(s) {
+          const tariffs =
+            s.manual_tariffs ||
+            operatorTariffs[s.operator] ||
+            {};
+
+          function price(period) {
+            const amount = tariffs[period];
+
+            if (
+              typeof amount !== "number" ||
+              !Number.isFinite(amount) ||
+              amount < 0
+            ) {
+              return "&nbsp;";
+            }
+
+            return (
+              esc(amount.toLocaleString("uz-UZ")) +
+              " so‘m/kWh" +
+              (
+                tariffs.estimated
+                  ? ' <span class="muted">(Taxminiy)</span>'
+                  : ""
+              )
+            );
+          }
+
+          const heading =
+            "<b>" +
+            esc(s.name || "Stansiya") +
+            "</b><br><span>" +
+            esc(s.address || s.region || "") +
+            "</span>";
+
+          const coords = encodeURIComponent(
+            s.lat + "," + s.lon
+          );
+
+          const links =
+            '<p><a target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&destination=' +
+            coords +
+            '">Google yo‘nalish</a> · <a target="_blank" rel="noopener noreferrer" href="https://yandex.com/maps/?rtext=~' +
+            coords +
+            '&rtt=auto">Yandex yo‘nalish</a></p>';
+
+          return (
+            heading +
+            '<div class="tariff-only"><p><b>Kunduzgi narx</b><br>' +
+            price("day") +
+            "</p><p><b>Kechki narx</b><br>" +
+            price("night") +
+            "</p></div>" +
+            links
+          );
+        }
+
+        let markers = [];
+
+        function matches(s) {
+          if (
+            userLocation &&
+            $("nearby").checked &&
+            distanceMeters(userLocation, s) >
+              Number($("radius").value)
+          ) {
+            return false;
+          }
+
+          if (
+            $("op").value &&
+            s.operator !== $("op").value
+          ) {
+            return false;
+          }
+
+          if (
+            $("region").value &&
+            s.region !== $("region").value
+          ) {
+            return false;
+          }
+
+          const q =
+            $("search").value.toLocaleLowerCase();
+
+          if (
+            q &&
+            !(
+              s.name +
+              " " +
+              s.address +
+              " " +
+              s.operator
+            )
+              .toLocaleLowerCase()
+              .includes(q)
+          ) {
+            return false;
+          }
+
+          return true;
+        }
+
+        function draw(fit = false) {
+          layer.clearLayers();
+          markers = [];
+
+          let list = stations.filter(matches);
+
+          list.sort(
+            userLocation
+              ? (a, b) =>
+                  distanceMeters(userLocation, a) -
+                  distanceMeters(userLocation, b)
+              : (a, b) =>
+                  String(a.name).localeCompare(
+                    String(b.name)
+                  )
+          );
+
+          const colors = {
+            available: "#0a9664",
+            busy: "#d95049",
+            unknown: "#7b8790",
+            unavailable: "#343c43",
+            reserved: "#db9521",
+            faulted: "#343c43",
+          };
+
+          let visible = list;
+
+          if (map.getZoom() < 16) {
+            const groups = new Map();
+
+            for (const s of list) {
+              const p = map.project(
+                [s.lat, s.lon],
+                map.getZoom()
+              );
+
+              const key =
+                Math.floor(p.x / 64) +
+                ":" +
+                Math.floor(p.y / 64);
+
+              if (!groups.has(key)) {
+                groups.set(key, []);
+              }
+
+              groups.get(key).push(s);
+            }
+
+            visible = [];
+
+            for (const group of groups.values()) {
+              if (group.length === 1) {
+                visible.push(group[0]);
+                continue;
+              }
+
+              const lat =
+                group.reduce((a, s) => a + s.lat, 0) /
+                group.length;
+
+              const lon =
+                group.reduce((a, s) => a + s.lon, 0) /
+                group.length;
+
+              MapUI.marker([lat, lon], {
+                title:
+                  group.length +
+                  " ta stansiya — yaqinlashtirish",
+
+                icon: MapUI.divIcon({
+                  className: "",
+                  html:
+                    '<div class="cluster-pin">' +
+                    group.length +
+                    "</div>",
+                  iconSize: [44, 44],
+                  iconAnchor: [22, 22],
+                }),
+              })
+                .on("click", () =>
+                  map.setView(
+                    [lat, lon],
+                    Math.min(16, map.getZoom() + 2)
+                  )
+                )
+                .addTo(layer);
+            }
+          }
+
+          for (const s of visible) {
+            const state = status(s);
+            const fill = colors[state] || colors.unknown;
+            const brand =
+              (payload.logos || {})[s.operator];
+
+            let m;
+
+            if ($("markerStyle").value === "logo") {
+              const title =
+                displayNames[s.operator] || s.operator;
+
+              const initial =
+                s.operator === "noma'lum"
+                  ? "?"
+                  : title
+                      .split(/\s+/)
+                      .map((w) => w[0])
+                      .join("")
+                      .slice(0, 3)
+                      .toUpperCase();
+
+              const content =
+                brand && brand.data_url
+                  ? '<img src="' +
+                    esc(brand.data_url) +
+                    '" alt="' +
+                    esc(title) +
+                    '">'
+                  : '<span class="fallback">' +
+                    esc(initial) +
+                    "</span>";
+
+              m = MapUI.marker([s.lat, s.lon], {
+                title: title + " — " + s.name,
+                alt: title,
+
+                icon: MapUI.divIcon({
+                  className: "brand-marker",
+
+                  html:
+                    '<div class="brand-badge" style="background:' +
+                    esc(brand?.background || "#ffffff") +
+                    '">' +
+                    content +
+                    '<span class="status-dot" style="background:' +
+                    fill +
+                    '"></span></div>',
+
+                  iconSize: [46, 42],
+                  iconAnchor: [23, 21],
+                  popupAnchor: [0, -22],
+                }),
+              });
+            } else {
+              m = MapUI.circleMarker(
+                [s.lat, s.lon],
+                {
+                  radius: 6,
+                  color: "#fff",
+                  weight: 1.2,
+                  fillColor: fill,
+                  fillOpacity: 0.9,
+                }
+              );
+            }
+
+            m.on("click", () => showStation(s))
+              .bindTooltip(
+                esc(
+                  (displayNames[s.operator] || s.operator) +
+                    " — " +
+                    s.name
+                )
+              )
+              .addTo(layer);
+
+            markers.push({ s, m });
+          }
+
+          if (
+            fit &&
+            userLocation &&
+            $("nearby").checked &&
+            radiusCircle
+          ) {
+            map.fitBounds(radiusCircle.getBounds(), {
+              padding: [35, 35],
+              maxZoom: 18,
+              animate: false,
+            });
+          } else if (fit && list.length) {
+            map.fitBounds(
+              list.map((s) => [s.lat, s.lon]),
+              {
+                padding: [25, 25],
+                maxZoom: 14,
+                animate: false,
+              }
+            );
+          }
+
+          if (
+            selectedStation &&
+            !list.includes(selectedStation)
+          ) {
+            closeStation();
+          } else if (selectedStation) {
+            $("stationContent").innerHTML =
+              popup(selectedStation);
+          }
+
+          $("emptyResult").hidden = !!list.length;
+
+          $("emptyResult").textContent = list.length
+            ? ""
+            : "Bu hududda stansiya topilmadi. Radius yoki filtrni o‘zgartiring.";
+        }
+
+        map.on("zoomend", () => draw(false));
+
+        function redrawLocation() {
+          if (radiusCircle) {
+            map.removeLayer(radiusCircle);
+          }
+
+          if (!userLocation) return;
+
+          radiusCircle = MapUI.circle(
+            [userLocation.lat, userLocation.lon],
+            {
+              radius: Number($("radius").value),
+              color: "#2477ed",
+              weight: 2,
+              fillColor: "#2477ed",
+              fillOpacity: 0.06,
+              interactive: false,
+            }
+          ).addTo(map);
+        }
+
+        /*
+         * Yaqindagi stansiya manzili aniq GPS manzil
+         * sifatida emas, "yaqinida" deb ko‘rsatiladi.
+         */
+
+        function locationName(point) {
+          let closest = null;
+          let best = Infinity;
+
+          for (const station of stations) {
+            if (
+              !Number.isFinite(station.lat) ||
+              !Number.isFinite(station.lon)
+            ) {
+              continue;
+            }
+
+            const address = String(
+              station.address || ""
+            ).trim();
+
+            const name = String(
+              station.name || ""
+            ).trim();
+
+            if (!address && !name) continue;
+
+            const distance = distanceMeters(
+              point,
+              station
+            );
+
+            if (distance < best) {
+              closest = station;
+              best = distance;
+            }
+          }
+
+          if (!closest || best > 2000) {
+            return point.manual
+              ? "Xaritadan tanlangan joy"
+              : "Joylashuvingiz xaritada belgilandi";
+          }
+
+          const parts = [
+            closest.region,
+            closest.address || closest.name,
+          ].filter(Boolean);
+
+          return (
+            [...new Set(parts)].join(", ") +
+            " yaqinida"
+          );
+        }
+
+        function setLocation(
+          lat,
+          lon,
+          accuracy,
+          manual
+        ) {
+          userLocation = {
+            lat,
+            lon,
+            accuracy,
+            manual,
+          };
+
+          if (userMarker) {
+            map.removeLayer(userMarker);
+          }
+
+          if (accuracyCircle) {
+            map.removeLayer(accuracyCircle);
+          }
+
+          accuracyCircle = null;
+
+          userMarker = MapUI.marker([lat, lon], {
+            icon: MapUI.divIcon({
+              className: "",
+              html: '<div class="user-location"></div>',
+              iconSize: [18, 18],
+              iconAnchor: [9, 9],
+            }),
+
+            zIndexOffset: 1000,
+
+            title: manual
+              ? "Tanlangan markaz"
+              : "Mening joylashuvim",
+          })
+            .addTo(map)
+            .bindPopup(
+              manual
+                ? "Xaritadan tanlangan markaz"
+                : "Sizning taxminiy joylashuvingiz"
+            );
+
+          if (
+            !manual &&
+            Number.isFinite(accuracy)
+          ) {
+            accuracyCircle = MapUI.circle(
+              [lat, lon],
+              {
+                radius: accuracy,
+                color: "#2477ed",
+                weight: 1,
+                dashArray: "4 4",
+                fillOpacity: 0.03,
+                interactive: false,
+              }
+            ).addTo(map);
+          }
+
+          $("nearby").disabled = false;
+          $("nearby").checked = true;
+          $("radius").disabled = false;
+          $("clearLocation").disabled = false;
+
+          const address = locationName(userLocation);
+
+          $("locationStatus").textContent =
+            (
+              manual
+                ? "Tanlangan joy: "
+                : "Siz turgan joy: "
+            ) + address;
+
+          userMarker.setPopupContent(esc(address));
+
+          redrawLocation();
+          draw(true);
+        }
+
+        /* Telegram Mini App */
+
+        const tg = window.Telegram?.WebApp;
+
+        if (tg?.initData) {
+          tg.ready();
+          tg.expand();
+          tg.setHeaderColor("#ffffff");
+          tg.setBackgroundColor("#f3f7f5");
+
+          if (tg.isVersionAtLeast("7.7")) {
+            tg.disableVerticalSwipes();
+          }
+        }
+
+        function miniAppLocation(
+          success,
+          failure,
+          options
+        ) {
+          const lm = tg?.LocationManager;
+
+          if (
+            tg?.initData &&
+            tg.isVersionAtLeast("8.0") &&
+            lm
+          ) {
+            lm.init(() => {
+              if (!lm.isLocationAvailable) {
+                browserLocation();
+                return;
+              }
+
+              lm.getLocation((p) => {
+                if (p) {
+                  success({
+                    coords: {
+                      latitude: p.latitude,
+                      longitude: p.longitude,
+                      accuracy: p.horizontal_accuracy,
+                    },
+                  });
+                } else {
+                  failure({ code: 1 });
+                }
+              });
+            });
+          } else {
+            browserLocation();
+          }
+
+          function browserLocation() {
+            if (navigator.geolocation) {
+              navigator.geolocation.getCurrentPosition(
+                success,
+                failure,
+                options
+              );
+            } else {
+              failure({ code: 2 });
+            }
+          }
+        }
+
+        /* Joylashuv tugmalari */
+
+        $("locate").addEventListener("click", () => {
+          if (
+            !navigator.geolocation &&
+            !window.Telegram?.WebApp?.LocationManager
+          ) {
+            $("locationStatus").textContent =
+              "Brauzer joylashuvni qo‘llamaydi. Markazni xaritadan tanlang.";
+            return;
+          }
+
+          pickingLocation = false;
+
+          $("pickLocation").setAttribute(
+            "aria-pressed",
+            "false"
+          );
+
+          map.getContainer().style.cursor = "";
+
+          const request = ++locationRequest;
+
+          $("locate").disabled = true;
+
+          $("locationStatus").textContent =
+            "Joylashuv aniqlanmoqda… Brauzer ruxsatini tasdiqlang.";
+
+          miniAppLocation(
+            (p) => {
+              if (request !== locationRequest) return;
+
+              $("locate").disabled = false;
+
+              setLocation(
+                p.coords.latitude,
+                p.coords.longitude,
+                p.coords.accuracy,
+                false
+              );
+            },
+
+            (e) => {
+              if (request !== locationRequest) return;
+
+              $("locate").disabled = false;
+
+              $("locationStatus").textContent =
+                {
+                  1: "Joylashuvga ruxsat berilmadi. Brauzer ruxsatini tekshiring yoki markazni xaritadan tanlang.",
+                  2: "Joylashuvni aniqlab bo‘lmadi. Markazni xaritadan tanlang.",
+                  3: "Joylashuvni aniqlash vaqti tugadi. Qayta urinib ko‘ring yoki markazni tanlang.",
+                }[e.code] || "Joylashuv olinmadi.";
+            },
+
+            {
+              enableHighAccuracy: true,
+              timeout: 15000,
+              maximumAge: 0,
+            }
+          );
+        });
+
+        $("pickLocation").addEventListener(
+          "click",
+          () => {
+            pickingLocation = !pickingLocation;
+
+            $("pickLocation").setAttribute(
+              "aria-pressed",
+              String(pickingLocation)
+            );
+
+            map.getContainer().style.cursor =
+              pickingLocation ? "crosshair" : "";
+
+            if (pickingLocation) {
+              $("locationStatus").textContent =
+                "Qidiruv markazi uchun xaritadagi kerakli joyni bosing.";
+            }
+          }
+        );
+
+        map.on("click", (e) => {
+          if (!pickingLocation) return;
+
+          locationRequest++;
+          $("locate").disabled = false;
+          pickingLocation = false;
+
+          $("pickLocation").setAttribute(
+            "aria-pressed",
+            "false"
+          );
+
+          map.getContainer().style.cursor = "";
+
+          setLocation(
+            e.latlng.lat,
+            e.latlng.lng,
+            null,
+            true
+          );
+        });
+
+        $("clearLocation").addEventListener(
+          "click",
+          () => {
+            locationRequest++;
+            userLocation = null;
+            pickingLocation = false;
+
+            $("pickLocation").setAttribute(
+              "aria-pressed",
+              "false"
+            );
+
+            map.getContainer().style.cursor = "";
+            $("locate").disabled = false;
+
+            for (const item of [
+              userMarker,
+              radiusCircle,
+              accuracyCircle,
+            ]) {
+              if (item) {
+                map.removeLayer(item);
+              }
+            }
+
+            userMarker = null;
+            radiusCircle = null;
+            accuracyCircle = null;
+
+            $("nearby").checked = false;
+            $("nearby").disabled = true;
+            $("radius").disabled = true;
+            $("clearLocation").disabled = true;
+
+            $("locationStatus").textContent =
+              "Joylashuv tozalandi.";
+
+            draw(true);
+          }
+        );
+
+        $("radius").addEventListener("input", () => {
+          $("radiusLabel").textContent = distanceLabel(
+            Number($("radius").value)
+          );
+
+          redrawLocation();
+          draw(false);
+        });
+
+        $("radius").addEventListener(
+          "change",
+          () => draw(true)
+        );
+
+        $("nearby").addEventListener(
+          "change",
+          () => draw(true)
+        );
+
+        $("markerStyle").addEventListener(
+          "change",
+          () => draw(false)
+        );
+
+        for (const id of ["op", "region"]) {
+          $(id).addEventListener(
+            "change",
+            () => draw(true)
+          );
+        }
+
+        $("search").addEventListener(
+          "input",
+          () => draw(true)
+        );
+
+        /* Xaritani ishga tushirish */
+
+        updateOptions();
+        draw(true);
+
+        setInterval(() => draw(false), 30000);
+
+        $("notice").style.display = "none";
+      }
+
+      /* Xarita yuklanishida xatolik */
+
+      initQuvvat().catch(() => {
+        const el = document.getElementById("notice");
+
+        el.style.display = "block";
+
+        el.textContent =
+          "Yandex xaritasi yuklanmadi. Internetni va API kalitidagi localhost ruxsatini tekshiring. Yangi sozlama faollashishi 15 daqiqagacha davom etishi mumkin.";
+
+        const actions = document.createElement("div");
+        actions.style.marginTop = "12px";
+
+        const retry = document.createElement("button");
+        retry.textContent = "Qayta urinish";
+        retry.onclick = () => location.reload();
+
+        const previous = document.createElement("a");
+        previous.href = "./map_previous.html";
+        previous.textContent = "Avvalgi xaritani ochish";
+        previous.style.marginLeft = "12px";
+
+        actions.append(retry, previous);
+        el.appendChild(actions);
+      });
+    </script>
+  </body>
+</html>
